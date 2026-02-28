@@ -1,0 +1,98 @@
+doctype html
+html
+  head
+    title Dashboard ERP
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css")
+
+  body.bg-light
+
+    // ===== NAVBAR =====
+    nav.navbar.navbar-dark.bg-dark.shadow-sm
+      .container-fluid
+        span.navbar-brand.fw-bold Mini ERP 🚀
+        a.btn.btn-outline-light(href="/") Cerrar sesión
+
+    .container-fluid
+      .row
+
+        // ===== SIDEBAR =====
+        .col-md-2.bg-white.shadow-sm.min-vh-100.p-3
+          h6.text-muted MENÚ
+          ul.nav.flex-column.mt-3
+            li.nav-item
+              a.nav-link.active(href="#")
+                i.bi.bi-speedometer2.me-2
+                | Dashboard
+            li.nav-item
+              a.nav-link(href="#")
+                i.bi.bi-people.me-2
+                | Empleados
+            li.nav-item
+              a.nav-link(href="#")
+                i.bi.bi-box-seam.me-2
+                | Productos
+            li.nav-item
+              a.nav-link(href="#")
+                i.bi.bi-cash-stack.me-2
+                | Ventas
+
+        // ===== CONTENIDO =====
+        .col-md-10.p-4
+
+          h2.mb-4 Panel de Control
+
+          // ==== TARJETAS ====
+          .row.g-4
+
+            .col-md-4
+              .card.shadow.border-0
+                .card-body
+                  .d-flex.justify-content-between
+                    div
+                      h6.text-muted Empleados
+                      h3.fw-bold #{empleados}
+                    i.bi.bi-people-fill.fs-1.text-primary
+
+            .col-md-4
+              .card.shadow.border-0
+                .card-body
+                  .d-flex.justify-content-between
+                    div
+                      h6.text-muted Productos
+                      h3.fw-bold #{productos}
+                    i.bi.bi-box-seam.fs-1.text-success
+
+            .col-md-4
+              .card.shadow.border-0
+                .card-body
+                  .d-flex.justify-content-between
+                    div
+                      h6.text-muted Ventas Totales
+                      h3.fw-bold $#{ventas}
+                    i.bi.bi-cash-stack.fs-1.text-warning
+
+          // ==== TABLA ====
+          .card.shadow.border-0.mt-5
+            .card-body
+              h5.mb-3 Últimas Ventas
+              table.table.table-hover
+                thead.table-light
+                  tr
+                    th ID
+                    th Cliente
+                    th Producto
+                    th Monto
+                tbody
+  if listaVentas && listaVentas.length > 0
+    each venta in listaVentas
+      tr
+        td #{venta.id}
+        td #{venta.cliente}
+        td #{venta.producto}
+        td $#{venta.monto}
+  else
+    tr
+      td(colspan="4").text-center.text-muted No hay ventas registradas
