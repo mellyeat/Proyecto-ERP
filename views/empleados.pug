@@ -1,0 +1,84 @@
+doctype html
+html
+  head
+    title Empleados - ERP
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css")
+
+  body.bg-light
+
+    nav.navbar.navbar-dark.bg-dark.shadow-sm
+      .container-fluid
+        span.navbar-brand.fw-bold Mini ERP
+        a.btn.btn-outline-light(href="/") Cerrar sesión
+
+    .container-fluid
+      .row
+
+        .col-md-2.bg-white.shadow-sm.min-vh-100.p-3
+          h6.text-muted MENÚ
+          ul.nav.flex-column.mt-3
+            li.nav-item
+              a.nav-link(href="/dashboard")
+                i.bi.bi-speedometer2.me-2
+                | Dashboard
+            li.nav-item
+              a.nav-link.active(href="/empleados")
+                i.bi.bi-people.me-2
+                | Empleados
+            li.nav-item
+              a.nav-link(href="/productos")
+                i.bi.bi-box-seam.me-2
+                | Productos
+            li.nav-item
+              a.nav-link(href="/ventas")
+                i.bi.bi-cash-stack.me-2
+                | Ventas
+
+ 
+        .col-md-10.p-4
+
+          h2.mb-4 Gestión de Empleados
+
+          .row
+            .col-md-4
+              .card.shadow.border-0
+                .card-header.bg-white.fw-bold
+                  | Agregar Empleado
+                .card-body
+                  form(action="/empleados/add", method="POST")
+                    .mb-3
+                      label.form-label Nombre
+                      input.form-control(type="text", name="nombre", required)
+                    .mb-3
+                      label.form-label Puesto
+                      input.form-control(type="text", name="puesto", required)
+                    .mb-3
+                      label.form-label Salario ($)
+                      input.form-control(type="number", step="0.01", name="salario", required)
+                    button.btn.btn-primary.w-100(type="submit") Añadir
+
+            .col-md-8
+              .card.shadow.border-0
+                .card-body
+                  h5.mb-3 Lista de Empleados
+                  table.table.table-hover
+                    thead.table-light
+                      tr
+                        th ID
+                        th Nombre
+                        th Puesto
+                        th Salario
+                    tbody
+                      if empleados && empleados.length > 0
+                        each emp in empleados
+                          tr
+                            td #{emp.id}
+                            td #{emp.nombre}
+                            td #{emp.puesto}
+                            td $#{emp.salario}
+                      else
+                        tr
+                          td(colspan="4").text-center.text-muted No hay empleados registrados

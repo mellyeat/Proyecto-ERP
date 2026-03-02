@@ -62,4 +62,112 @@ router.get('/dashboard', (req, res) => {
 
 });
 
+// Empleados
+router.get('/empleados', (req, res) => {
+    db.query("SELECT * FROM empleados", (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error fetching employees");
+        }
+        res.render('empleados', { empleados: results });
+    });
+});
+
+router.post('/empleados/add', (req, res) => {
+    const { nombre, puesto, salario } = req.body;
+    db.query(
+        "INSERT INTO empleados (nombre, puesto, salario) VALUES (?, ?, ?)",
+        [nombre, puesto, salario],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error adding employee");
+            }
+            res.redirect('/empleados');
+        }
+    );
+});
+
+// Productos
+router.get('/productos', (req, res) => {
+    db.query("SELECT * FROM productos", (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error fetching products");
+        }
+        res.render('productos', { productos: results });
+    });
+});
+
+router.post('/productos/add', (req, res) => {
+    const { nombre, stock, precio } = req.body;
+    db.query(
+        "INSERT INTO productos (nombre, stock, precio) VALUES (?, ?, ?)",
+        [nombre, stock, precio],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error adding product");
+            }
+            res.redirect('/productos');
+        }
+    );
+});
+
+// Ventas
+router.get('/ventas', (req, res) => {
+    db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error fetching sales");
+        }
+        res.render('ventas', { ventas: results });
+    });
+});
+
+router.post('/ventas/add', (req, res) => {
+    const { cliente, producto, monto } = req.body;
+    db.query(
+        "INSERT INTO ventas (cliente, producto, monto) VALUES (?, ?, ?)",
+        [cliente, producto, monto],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error adding sale");
+            }
+            res.redirect('/ventas');
+        }
+    );
+});
+
+// API para Métricas del Dashboard
+router.get('/api/metricas', (req, res) => {
+    // Top 5 productos más vendidos (por cantidad de apariciones)
+    db.query("SELECT producto, COUNT(*) as cantidad FROM ventas GROUP BY producto ORDER BY cantidad DESC LIMIT 5", (err, topProductos) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error fetching metrics" });
+        }
+
+        // Ventas por los últimos 7 días
+        db.query(`
+            SELECT DATE(fecha) as fecha, SUM(monto) as total 
+            FROM ventas 
+            WHERE fecha >= DATE(NOW()) - INTERVAL 7 DAY 
+            GROUP BY DATE(fecha) 
+            ORDER BY fecha ASC
+        `, (err, ventasPorDia) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: "Error fetching metrics" });
+            }
+
+            res.json({
+                topProductos,
+                ventasPorDia
+            });
+        });
+    });
+});
+
 module.exports = router;
