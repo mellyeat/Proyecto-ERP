@@ -86,13 +86,13 @@ html
                     th Producto
                     th Monto
                 tbody
-  if listaVentas && listaVentas.length > 0
-    each venta in listaVentas
-      tr
-        td #{venta.id}
-        td #{venta.cliente}
-        td #{venta.producto}
-        td $#{venta.monto}
-  else
-    tr
-      td(colspan="4").text-center.text-muted No hay ventas registradas
+                  if listaVentas && listaVentas.length > 0
+                    each venta in listaVentas
+                      tr
+                        td #{venta.id}
+                        td #{venta.cliente}
+                        td #{venta.producto}
+                        td $#{venta.monto}
+                  else
+                    tr
+                      td(colspan="4").text-center.text-muted No hay ventas registradas
