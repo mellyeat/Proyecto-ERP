@@ -7,11 +7,8 @@ router.get('/', (req, res) => {
     res.render('index');
 });
 
-// VALIDAR LOGIN EN LA MISMA RUTA /
+// VALIDAR LOGIN
 router.post('/', (req, res) => {
-
-    console.log("Entró al POST 🔥");
-    console.log("Datos recibidos:", req.body);
 
     const { usuario, password } = req.body;
 
@@ -21,17 +18,13 @@ router.post('/', (req, res) => {
         (err, results) => {
 
             if (err) {
-                console.log("Error SQL:", err);
                 return res.send("Error del servidor");
             }
 
-            console.log("Resultados:", results);
 
             if (results.length === 1) {
-                console.log("Login correcto ✅");
                 res.redirect('/dashboard');
             } else {
-                console.log("Login incorrecto ❌");
                 res.render('index', {
                     error: "Usuario o contraseña incorrectos ❌"
                 });
