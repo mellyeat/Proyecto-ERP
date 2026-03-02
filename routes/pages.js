@@ -2,9 +2,42 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-// Login
+// MOSTRAR LOGIN
 router.get('/', (req, res) => {
     res.render('index');
+});
+
+// VALIDAR LOGIN EN LA MISMA RUTA /
+router.post('/', (req, res) => {
+
+    console.log("Entró al POST 🔥");
+    console.log("Datos recibidos:", req.body);
+
+    const { usuario, password } = req.body;
+
+    db.query(
+        "SELECT * FROM usuarios WHERE usuario = ? AND password = ?",
+        [usuario, password],
+        (err, results) => {
+
+            if (err) {
+                console.log("Error SQL:", err);
+                return res.send("Error del servidor");
+            }
+
+            console.log("Resultados:", results);
+
+            if (results.length === 1) {
+                console.log("Login correcto ✅");
+                res.redirect('/dashboard');
+            } else {
+                console.log("Login incorrecto ❌");
+                res.render('index', {
+                    error: "Usuario o contraseña incorrectos ❌"
+                });
+            }
+        }
+    );
 });
 
 // Dashboard
