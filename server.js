@@ -3,7 +3,7 @@ const path = require('path');
 
 const app = express();
 
-// 🔥 Motor de vistas PUG
+//motor de vistas
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
