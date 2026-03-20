@@ -19,16 +19,16 @@ block content
               | Agregar Empleado
           .p-4
             form(action="/empleados/add", method="POST")
-            .mb-3
-              label.form-label.text-muted.small Nombre Completo
-              input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Juan Pérez", required)
-            .mb-3
-              label.form-label.text-muted.small Puesto
-              input.form-control.bg-light(type="text", name="puesto", placeholder="Ej: Administrador", required)
-            .mb-3
-              label.form-label.text-muted.small Salario Mensual ($)
-              input.form-control.bg-light(type="number", step="0.01", name="salario", placeholder="Ej: 1500.00", required)
-            button.btn.btn-primary-custom.w-100(type="submit") Añadir Empleado
+              .mb-3
+                label.form-label.text-muted.small Nombre Completo
+                input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Juan Pérez", required)
+              .mb-3
+                label.form-label.text-muted.small Puesto
+                input.form-control.bg-light(type="text", name="puesto", placeholder="Ej: Administrador", required)
+              .mb-3
+                label.form-label.text-muted.small Salario Mensual ($)
+                input.form-control.bg-light(type="number", step="0.01", name="salario", placeholder="Ej: 1500.00", required)
+              button.btn.btn-primary-custom.w-100(type="submit") Añadir Empleado
 
     .col-md-8
       .card-custom.h-100

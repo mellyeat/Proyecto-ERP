@@ -19,48 +19,48 @@ block content
               | Registrar Nueva Venta
           .p-4
             form(action="/ventas/add", method="POST")
-            
-            .mb-3
-              label.form-label.text-muted.small Nombre del Cliente
-              input.form-control.bg-light(type="text", name="cliente", placeholder="Ej: Empresa ACME", required)
+              
+              .mb-3
+                label.form-label.text-muted.small Nombre del Cliente
+                input.form-control.bg-light(type="text", name="cliente", placeholder="Ej: Empresa ACME", required)
 
-            .mb-3
-              label.form-label.text-muted.small Seleccionar Producto
-              select.form-select.bg-light(name="producto", id="producto", required)
-                option(value="" disabled selected) Elige un producto
-                if productos && productos.length > 0
-                  each prod in productos
-                    option(
-                      value=prod.nombre
-                      data-precio=prod.precio
-                    ) #{prod.nombre} - $#{prod.precio}
-                else
-                  option(value="" disabled) No hay productos disponibles
+              .mb-3
+                label.form-label.text-muted.small Seleccionar Producto
+                select.form-select.bg-light(name="producto", id="producto", required)
+                  option(value="" disabled selected) Elige un producto
+                  if productos && productos.length > 0
+                    each prod in productos
+                      option(
+                        value=prod.nombre
+                        data-precio=prod.precio
+                      ) #{prod.nombre} - $#{prod.precio}
+                  else
+                    option(value="" disabled) No hay productos disponibles
 
-            .row.mb-3
-              .col-6
-                label.form-label.text-muted.small Cantidad
-                input.form-control.bg-light(
-                  type="number",
-                  name="cantidad",
-                  id="cantidad",
-                  min="1",
-                  value="1",
-                  required
-                )
-              .col-6
-                label.form-label.text-muted.small Total ($)
-                input.form-control.bg-white.fw-bold(
-                  type="number",
-                  step="0.01",
-                  name="monto",
-                  id="monto",
-                  required,
-                  readonly,
-                  style="color: var(--color-teal);"
-                )
+              .row.mb-3
+                .col-6
+                  label.form-label.text-muted.small Cantidad
+                  input.form-control.bg-light(
+                    type="number",
+                    name="cantidad",
+                    id="cantidad",
+                    min="1",
+                    value="1",
+                    required
+                  )
+                .col-6
+                  label.form-label.text-muted.small Total ($)
+                  input.form-control.bg-white.fw-bold(
+                    type="number",
+                    step="0.01",
+                    name="monto",
+                    id="monto",
+                    required,
+                    readonly,
+                    style="color: var(--color-teal);"
+                  )
 
-            button.btn.btn-primary-custom.w-100(type="submit") Confirmar Venta
+              button.btn.btn-primary-custom.w-100(type="submit") Confirmar Venta
 
     .col-md-8
       .card-custom.h-100

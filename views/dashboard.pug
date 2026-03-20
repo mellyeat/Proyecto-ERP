@@ -70,7 +70,7 @@ block content
             if listaVentas && listaVentas.length > 0
               each venta in listaVentas
                 tr
-                  td.fw-bold # #{venta.id}
+                  td.text-muted ##{venta.id}
                   td #{venta.cliente}
                   td #{venta.producto}
                   td.fw-bold(style="color: var(--color-teal);") $#{venta.monto}

@@ -19,16 +19,16 @@ block content
               | Agregar Producto
           .p-4
             form(action="/productos/add", method="POST")
-            .mb-3
-              label.form-label.text-muted.small Nombre del Producto
-              input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Teclado Mecánico", required)
-            .mb-3
-              label.form-label.text-muted.small Stock Disponible
-              input.form-control.bg-light(type="number", name="stock", placeholder="Ej: 50", required)
-            .mb-3
-              label.form-label.text-muted.small Precio Unitario ($)
-              input.form-control.bg-light(type="number", step="0.01", name="precio", placeholder="Ej: 25.50", required)
-            button.btn.btn-primary-custom.w-100(type="submit") Añadir Producto
+              .mb-3
+                label.form-label.text-muted.small Nombre del Producto
+                input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Teclado Mecánico", required)
+              .mb-3
+                label.form-label.text-muted.small Stock Disponible
+                input.form-control.bg-light(type="number", name="stock", placeholder="Ej: 50", required)
+              .mb-3
+                label.form-label.text-muted.small Precio Unitario ($)
+                input.form-control.bg-light(type="number", step="0.01", name="precio", placeholder="Ej: 25.50", required)
+              button.btn.btn-primary-custom.w-100(type="submit") Añadir Producto
 
     .col-md-8
       .card-custom.h-100
