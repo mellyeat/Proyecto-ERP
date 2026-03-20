@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mapea todos los archivos de tu computadora a /app del contenedor
+      # para que cuando guardes un archivo, nodemon lo detecte en automático (Live reload)
+      - .:/app
+      # Protege la carpeta node_modules del contenedor para que no se sobreescriba con la de tu host local
+      - /app/node_modules
+    environment:
+      # Variables de entorno para conectar Node con el servicio 'db'
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=
+      - DB_NAME=erp_db
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      # Permitir password vacío para entorno local de dev
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=erp_db
+    ports:
+      # Permite conectar DBeaver o Workbench a MySQL desde fuera de Docker en este puerto
+      - "3306:3306"
+    volumes:
+      # Persistencia de datos, si borras el contenedor y lo vuelves a levantar no pierdes info
+      - mysql_data:/var/lib/mysql
+      # Copia el script SQL al init folder para que se autogenere al construir la DB desde cero
+      - ./erp_db.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  mysql_data:
