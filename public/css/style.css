@@ -1,0 +1,150 @@
+:root {
+  --color-dark-teal: #09637E;
+  --color-teal: #088395;
+  --color-light-teal: #7AB2B2;
+  --color-bg: #EBF4F6;
+  --color-white: #FFFFFF;
+  --color-text: #333333;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  background-color: var(--color-bg) !important;
+  color: var(--color-text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
+}
+
+
+.sidebar {
+  background-color: var(--color-dark-teal);
+  color: var(--color-white);
+  min-height: 100vh;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+}
+
+.sidebar-heading {
+  font-weight: bold;
+  font-size: 1.25rem;
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.nav-link.sidebar-link {
+  color: rgba(255, 255, 255, 0.8) !important;
+  padding: 0.8rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  margin: 0.2rem 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.nav-link.sidebar-link:hover {
+  background-color: var(--color-teal);
+  color: var(--color-white) !important;
+  transform: translateX(5px);
+}
+
+.nav-link.sidebar-link.active {
+  background-color: var(--color-teal);
+  color: var(--color-white) !important;
+  font-weight: bold;
+  box-shadow: var(--shadow-sm);
+}
+
+
+.top-navbar {
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  padding: 0.75rem 1.5rem;
+}
+
+.top-navbar .navbar-brand {
+  color: var(--color-dark-teal);
+  font-weight: bold;
+}
+
+
+.card-custom {
+  background-color: var(--color-white);
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-custom:hover {
+  box-shadow: var(--shadow-md);
+}
+
+
+.btn-primary-custom {
+  background-color: var(--color-teal);
+  color: var(--color-white);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+  background-color: var(--color-dark-teal);
+  color: var(--color-white);
+}
+
+.btn-outline-custom {
+  color: var(--color-teal);
+  border: 1px solid var(--color-teal);
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-custom:hover {
+  background-color: var(--color-teal);
+  color: var(--color-white);
+}
+
+
+.table-custom {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table-custom thead th {
+  background-color: var(--color-light-teal);
+  color: var(--color-white);
+  border: none;
+  padding: 1rem;
+}
+
+.table-custom tbody tr {
+  transition: background-color 0.2s;
+}
+
+.table-custom tbody tr:hover {
+  background-color: rgba(122, 178, 178, 0.1);
+}
+
+.table-custom tbody td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+}
+
+
+.metric-icon-empleados { color: #09637E; }
+.metric-icon-productos { color: #088395; }
+.metric-icon-ventas { color: #7AB2B2; }
+
+
+.login-card {
+  border-radius: 16px;
+  border-top: 5px solid var(--color-dark-teal);
+}

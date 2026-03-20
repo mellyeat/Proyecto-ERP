@@ -6,45 +6,54 @@ block variables
 
 block content
 
-          h2.mb-4 Gestión de Empleados
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Gestión de Empleados
 
-          .row
-            .col-md-4
-              .card.shadow.border-0
-                .card-header.bg-white.fw-bold
-                  | Agregar Empleado
-                .card-body
-                  form(action="/empleados/add", method="POST")
-                    .mb-3
-                      label.form-label Nombre
-                      input.form-control(type="text", name="nombre", required)
-                    .mb-3
-                      label.form-label Puesto
-                      input.form-control(type="text", name="puesto", required)
-                    .mb-3
-                      label.form-label Salario ($)
-                      input.form-control(type="number", step="0.01", name="salario", required)
-                    button.btn.btn-primary.w-100(type="submit") Añadir
+  .row.g-4
+    .col-md-4
+      .card-custom
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+              i.fa-solid.fa-user-plus.me-2
+              | Agregar Empleado
+          .p-4
+            form(action="/empleados/add", method="POST")
+            .mb-3
+              label.form-label.text-muted.small Nombre Completo
+              input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Juan Pérez", required)
+            .mb-3
+              label.form-label.text-muted.small Puesto
+              input.form-control.bg-light(type="text", name="puesto", placeholder="Ej: Administrador", required)
+            .mb-3
+              label.form-label.text-muted.small Salario Mensual ($)
+              input.form-control.bg-light(type="number", step="0.01", name="salario", placeholder="Ej: 1500.00", required)
+            button.btn.btn-primary-custom.w-100(type="submit") Añadir Empleado
 
-            .col-md-8
-              .card.shadow.border-0
-                .card-body
-                  h5.mb-3 Lista de Empleados
-                  table.table.table-hover
-                    thead.table-light
-                      tr
-                        th ID
-                        th Nombre
-                        th Puesto
-                        th Salario
-                    tbody
-                      if empleados && empleados.length > 0
-                        each emp in empleados
-                          tr
-                            td #{emp.id}
-                            td #{emp.nombre}
-                            td #{emp.puesto}
-                            td $#{emp.salario}
-                      else
-                        tr
-                          td(colspan="4").text-center.text-muted No hay empleados registrados
+    .col-md-8
+      .card-custom.h-100
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+              i.fa-solid.fa-list.me-2
+              | Lista de Empleados
+          .table-responsive
+            table.table.table-custom.mb-0
+              thead
+                tr
+                  th ID
+                  th Nombre
+                  th Puesto
+                  th Salario
+              tbody
+                if empleados && empleados.length > 0
+                  each emp in empleados
+                    tr
+                      td.text-muted ##{emp.id}
+                      td.fw-bold #{emp.nombre}
+                      td 
+                        span.badge.bg-light.text-dark.border #{emp.puesto}
+                      td.fw-bold(style="color: var(--color-teal);") $#{emp.salario}
+                else
+                  tr
+                    td(colspan="4").text-center.text-muted.p-4 No hay empleados registrados

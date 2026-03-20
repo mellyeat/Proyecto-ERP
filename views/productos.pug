@@ -6,45 +6,57 @@ block variables
 
 block content
 
-          h2.mb-4 Gestión de Productos
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Gestión de Productos
 
-          .row
-            .col-md-4
-              .card.shadow.border-0
-                .card-header.bg-white.fw-bold
-                  | Agregar Producto
-                .card-body
-                  form(action="/productos/add", method="POST")
-                    .mb-3
-                      label.form-label Nombre del Producto
-                      input.form-control(type="text", name="nombre", required)
-                    .mb-3
-                      label.form-label Stock
-                      input.form-control(type="number", name="stock", required)
-                    .mb-3
-                      label.form-label Precio ($)
-                      input.form-control(type="number", step="0.01", name="precio", required)
-                    button.btn.btn-success.w-100(type="submit") Añadir
+  .row.g-4
+    .col-md-4
+      .card-custom
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+              i.fa-solid.fa-plus-circle.me-2
+              | Agregar Producto
+          .p-4
+            form(action="/productos/add", method="POST")
+            .mb-3
+              label.form-label.text-muted.small Nombre del Producto
+              input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Teclado Mecánico", required)
+            .mb-3
+              label.form-label.text-muted.small Stock Disponible
+              input.form-control.bg-light(type="number", name="stock", placeholder="Ej: 50", required)
+            .mb-3
+              label.form-label.text-muted.small Precio Unitario ($)
+              input.form-control.bg-light(type="number", step="0.01", name="precio", placeholder="Ej: 25.50", required)
+            button.btn.btn-primary-custom.w-100(type="submit") Añadir Producto
 
-            .col-md-8
-              .card.shadow.border-0
-                .card-body
-                  h5.mb-3 Inventario de Productos
-                  table.table.table-hover
-                    thead.table-light
-                      tr
-                        th ID
-                        th Nombre
-                        th Stock
-                        th Precio
-                    tbody
-                      if productos && productos.length > 0
-                        each prod in productos
-                          tr
-                            td #{prod.id}
-                            td #{prod.nombre}
-                            td(class=prod.stock < 10 ? 'text-danger fw-bold' : '') #{prod.stock}
-                            td $#{prod.precio}
-                      else
-                        tr
-                          td(colspan="4").text-center.text-muted No hay productos registrados
+    .col-md-8
+      .card-custom.h-100
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+              i.fa-solid.fa-boxes-stacked.me-2
+              | Inventario
+          .table-responsive
+            table.table.table-custom.mb-0
+              thead
+                tr
+                  th ID
+                  th Producto
+                  th Stock
+                  th Precio
+              tbody
+                if productos && productos.length > 0
+                  each prod in productos
+                    tr
+                      td.text-muted ##{prod.id}
+                      td.fw-bold #{prod.nombre}
+                      td
+                        if prod.stock < 10
+                          span.badge.bg-danger #{prod.stock} (Bajo)
+                        else
+                          span.badge.bg-success #{prod.stock}
+                      td.fw-bold(style="color: var(--color-teal);") $#{prod.precio}
+                else
+                  tr
+                    td(colspan="4").text-center.text-muted.p-4 No hay productos registrados

@@ -5,75 +5,78 @@ block variables
   - var title = 'Dashboard ERP'
 
 block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Panel de Control
+    span.text-muted Resumen General
 
-          h2.mb-4 Panel de Control
+  // Metricas
+  .row.g-4
+    .col-md-4
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Total Empleados
+            h3.fw-bold.mb-0 #{empleados}
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(9, 99, 126, 0.1);")
+            i.fa-solid.fa-users.fs-3.metric-icon-empleados
 
-          // tarjetas prim
-          .row.g-4
+    .col-md-4
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Total Productos
+            h3.fw-bold.mb-0 #{productos}
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(8, 131, 149, 0.1);")
+            i.fa-solid.fa-box-open.fs-3.metric-icon-productos
 
-            .col-md-4
-              .card.shadow.border-0
-                .card-body
-                  .d-flex.justify-content-between
-                    div
-                      h6.text-muted Empleados
-                      h3.fw-bold #{empleados}
-                    i.fa-solid.fa-users.fs-1.text-primary
+    .col-md-4
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Ventas Totales
+            h3.fw-bold.mb-0 $#{ventas}
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(122, 178, 178, 0.1);")
+            i.fa-solid.fa-money-bill-wave.fs-3.metric-icon-ventas
 
-            .col-md-4
-              .card.shadow.border-0
-                .card-body
-                  .d-flex.justify-content-between
-                    div
-                      h6.text-muted Productos
-                      h3.fw-bold #{productos}
-                    i.fa-solid.fa-box-open.fs-1.text-success
+  // Gráficos
+  .row.mt-4.g-4
+    .col-md-6
+      .card-custom.h-100
+        .card-body
+          h6.fw-bold.mb-3(style="color: var(--color-dark-teal);") Ventas por Día (Últimos 7 días)
+          canvas#ventasChart(height="220" style="max-height: 250px;")
+    
+    .col-md-6
+      .card-custom.h-100
+        .card-body
+          h6.fw-bold.mb-3(style="color: var(--color-dark-teal);") Top 5 Productos Vendidos
+          .d-flex.justify-content-center
+            canvas#productosChart(height="220" style="max-height: 250px;")
 
-            .col-md-4
-              .card.shadow.border-0
-                .card-body
-                  .d-flex.justify-content-between
-                    div
-                      h6.text-muted Ventas Totales
-                      h3.fw-bold $#{ventas}
-                    i.fa-solid.fa-money-bill-wave.fs-1.text-warning
-
-          // Gráficos (Métricas)
-          .row.mt-4
-            .col-md-6
-              .card.shadow.border-0
-                .card-header.bg-white.fw-bold Ventas por Día (Últimos 7 días)
-                .card-body
-                  canvas#ventasChart(height="200")
-            
-            .col-md-6
-              .card.shadow.border-0
-                .card-header.bg-white.fw-bold Top 5 Productos Vendidos
-                .card-body
-                  canvas#productosChart(height="200")
-
-          // tabla principal
-          .card.shadow.border-0.mt-4
-            .card-body
-              h5.mb-3 Últimas Ventas
-              table.table.table-hover
-                thead.table-light
-                  tr
-                    th ID
-                    th Cliente
-                    th Producto
-                    th Monto
-                tbody
-                  if listaVentas && listaVentas.length > 0
-                    each venta in listaVentas
-                      tr
-                        td #{venta.id}
-                        td #{venta.cliente}
-                        td #{venta.producto}
-                        td $#{venta.monto}
-                  else
-                    tr
-                      td(colspan="4").text-center.text-muted No hay ventas registradas
+  // tabla principal
+  .card-custom.mt-4.mb-4
+    .card-body.p-0
+      .p-3.border-bottom
+        h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") Últimas Ventas
+      .table-responsive
+        table.table.table-custom.mb-0
+          thead
+            tr
+              th ID
+              th Cliente
+              th Producto
+              th Monto
+          tbody
+            if listaVentas && listaVentas.length > 0
+              each venta in listaVentas
+                tr
+                  td.fw-bold # #{venta.id}
+                  td #{venta.cliente}
+                  td #{venta.producto}
+                  td.fw-bold(style="color: var(--color-teal);") $#{venta.monto}
+            else
+              tr
+                td(colspan="4").text-center.text-muted.p-4 No hay ventas registradas
 
 block scripts
     script(src="https://cdn.jsdelivr.net/npm/chart.js")
@@ -82,6 +85,11 @@ block scripts
         try {
           const res = await fetch('/api/metricas');
           const data = await res.json();
+          
+          // Palette Colors
+          const colorDarkTeal = '#09637E';
+          const colorTeal = '#088395';
+          const colorLightTeal = '#7AB2B2';
           
           // Configurar gráfico de Ventas por Día (Líneas)
           const ctxVentas = document.getElementById('ventasChart').getContext('2d');
@@ -92,14 +100,23 @@ block scripts
               datasets: [{
                 label: 'Ventas Diarias ($)',
                 data: data.ventasPorDia.map(v => v.total),
-                borderColor: '#0d6efd',
-                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                borderColor: colorTeal,
+                backgroundColor: 'rgba(8, 131, 149, 0.1)',
                 borderWidth: 2,
+                pointBackgroundColor: colorDarkTeal,
                 fill: true,
-                tension: 0.3
+                tension: 0.4
               }]
             },
-            options: { responsive: true }
+            options: { 
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { 
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+              }
+            }
           });
 
           // Configurar gráfico de Top Productos (Dona)
@@ -111,10 +128,15 @@ block scripts
               datasets: [{
                 label: 'Cantidad Vendida',
                 data: data.topProductos.map(p => p.cantidad),
-                backgroundColor: ['#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6c757d']
+                backgroundColor: [colorDarkTeal, colorTeal, colorLightTeal, '#5c9898', '#387383'],
+                borderWidth: 0
               }]
             },
-            options: { responsive: true }
+            options: { 
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: 'right' } }
+            }
           });
 
         } catch (error) {
