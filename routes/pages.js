@@ -21,7 +21,6 @@ router.post('/', (req, res) => {
                 return res.send("Error del servidor");
             }
 
-
             if (results.length === 1) {
                 res.redirect('/dashboard');
             } else {
@@ -114,42 +113,79 @@ router.post('/productos/add', (req, res) => {
     );
 });
 
-// Ventas
+// VENTAS (CORREGIDO)
 router.get('/ventas', (req, res) => {
-    db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, results) => {
+
+    db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, ventas) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Error fetching sales");
         }
-        res.render('ventas', { ventas: results });
+
+        db.query("SELECT * FROM productos", (err, productos) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error fetching products");
+            }
+
+            res.render('ventas', {
+                ventas: ventas,
+                productos: productos
+            });
+
+        });
     });
 });
 
+// AGREGAR VENTA (PRO)
 router.post('/ventas/add', (req, res) => {
-    const { cliente, producto, monto } = req.body;
-    db.query(
-        "INSERT INTO ventas (cliente, producto, monto) VALUES (?, ?, ?)",
-        [cliente, producto, monto],
-        (err) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).send("Error adding sale");
-            }
-            res.redirect('/ventas');
+    const { cliente, producto, monto, cantidad } = req.body;
+
+    db.query("SELECT * FROM productos WHERE nombre = ?", [producto], (err, result) => {
+        if (err || result.length === 0) {
+            return res.send("Producto no encontrado");
         }
-    );
+
+        const prod = result[0];
+
+        // Validar stock
+        if (prod.stock < cantidad) {
+            return res.send("Stock insuficiente");
+        }
+
+        // Insertar venta
+        db.query(
+            "INSERT INTO ventas (cliente, producto, monto) VALUES (?, ?, ?)",
+            [cliente, producto, monto],
+            (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send("Error adding sale");
+                }
+
+                // Descontar stock
+                db.query(
+                    "UPDATE productos SET stock = stock - ? WHERE nombre = ?",
+                    [cantidad, producto],
+                    (err) => {
+                        if (err) console.log(err);
+
+                        res.redirect('/ventas');
+                    }
+                );
+            }
+        );
+    });
 });
 
-// API para Métricas del Dashboard
+// API métricas
 router.get('/api/metricas', (req, res) => {
-    // Top 5 productos más vendidos (por cantidad de apariciones)
     db.query("SELECT producto, COUNT(*) as cantidad FROM ventas GROUP BY producto ORDER BY cantidad DESC LIMIT 5", (err, topProductos) => {
         if (err) {
             console.log(err);
             return res.status(500).json({ error: "Error fetching metrics" });
         }
 
-        // Ventas por los últimos 7 días
         db.query(`
             SELECT DATE(fecha) as fecha, SUM(monto) as total 
             FROM ventas 

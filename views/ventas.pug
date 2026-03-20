@@ -6,47 +6,98 @@ block variables
 
 block content
 
-          h2.mb-4 Gestión de Ventas
+  h2.mb-4 Gestión de Ventas
 
-          .row
-            .col-md-4
-              .card.shadow.border-0
-                .card-header.bg-white.fw-bold
-                  | Registrar Venta
-                .card-body
-                  form(action="/ventas/add", method="POST")
-                    .mb-3
-                      label.form-label Nombre del Cliente
-                      input.form-control(type="text", name="cliente", required)
-                    .mb-3
-                      label.form-label Producto
-                      input.form-control(type="text", name="producto", required)
-                    .mb-3
-                      label.form-label Monto de Venta ($)
-                      input.form-control(type="number", step="0.01", name="monto", required)
-                    button.btn.btn-warning.w-100(type="submit") Registrar Venta
+  .row
+    .col-md-4
+      .card.shadow.border-0
+        .card-header.bg-white.fw-bold
+          | Registrar Venta
+        .card-body
+          form(action="/ventas/add", method="POST")
+            
+            .mb-3
+              label.form-label Nombre del Cliente
+              input.form-control(type="text", name="cliente", required)
 
-            .col-md-8
-              .card.shadow.border-0
-                .card-body
-                  h5.mb-3 Historial de Ventas
-                  table.table.table-hover
-                    thead.table-light
-                      tr
-                        th ID
-                        th Cliente
-                        th Producto
-                        th Monto
-                        th Fecha
-                    tbody
-                      if ventas && ventas.length > 0
-                        each venta in ventas
-                          tr
-                            td #{venta.id}
-                            td #{venta.cliente}
-                            td #{venta.producto}
-                            td $#{venta.monto}
-                            td #{new Date(venta.fecha).toLocaleString()}
-                      else
-                        tr
-                          td(colspan="5").text-center.text-muted No hay ventas registradas
+            .mb-3
+              label.form-label Producto
+              select.form-select(name="producto", id="producto", required)
+                option(value="") Selecciona un producto
+                if productos && productos.length > 0
+                  each prod in productos
+                    option(
+                      value=prod.nombre
+                      data-precio=prod.precio
+                    ) #{prod.nombre}
+                else
+                  option(value="") No hay productos disponibles
+
+            .mb-3
+              label.form-label Cantidad
+              input.form-control(
+                type="number",
+                name="cantidad",
+                id="cantidad",
+                min="1",
+                value="1",
+                required
+              )
+
+            .mb-3
+              label.form-label Monto de Venta ($)
+              input.form-control(
+                type="number",
+                step="0.01",
+                name="monto",
+                id="monto",
+                required,
+                readonly
+              )
+
+            button.btn.btn-warning.w-100(type="submit") Registrar Venta
+
+    .col-md-8
+      .card.shadow.border-0
+        .card-body
+          h5.mb-3 Historial de Ventas
+          table.table.table-hover
+            thead.table-light
+              tr
+                th ID
+                th Cliente
+                th Producto
+                th Monto
+                th Fecha
+            tbody
+              if ventas && ventas.length > 0
+                each venta in ventas
+                  tr
+                    td #{venta.id}
+                    td #{venta.cliente}
+                    td #{venta.producto}
+                    td $#{venta.monto}
+                    td #{new Date(venta.fecha).toLocaleString()}
+              else
+                tr
+                  td(colspan="5").text-center.text-muted No hay ventas registradas
+
+  // 🔥 SCRIPT PARA AUTOMATIZAR PRECIO Y TOTAL
+  script.
+    const selectProducto = document.getElementById('producto');
+    const inputMonto = document.getElementById('monto');
+    const inputCantidad = document.getElementById('cantidad');
+
+    function actualizarTotal() {
+      const precio = selectProducto.options[selectProducto.selectedIndex]?.dataset.precio;
+      const cantidad = inputCantidad.value;
+
+      if (precio && cantidad) {
+        inputMonto.value = (precio * cantidad).toFixed(2);
+      } else {
+        inputMonto.value = '';
+      }
+    }
+
+    selectProducto.addEventListener('change', actualizarTotal);
+    inputCantidad.addEventListener('input', actualizarTotal);
