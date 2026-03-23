@@ -2,6 +2,22 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const PORT = 3000;
+const session = require('express-session');
+
+// configuración de sesiones
+app.use(session({
+    secret: 'llave-secreta',
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Esto elimina el cache
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
 
 //motor de vistas
 app.set('view engine', 'pug');

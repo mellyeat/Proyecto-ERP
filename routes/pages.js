@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const verificarSesion = require('../middleware/auth');
 
 // MOSTRAR LOGIN
 router.get('/', (req, res) => {
@@ -21,10 +22,11 @@ router.post('/', (req, res) => {
                 return res.send("Error del servidor");
             }
 
-            if (results.length === 1) {
-                res.redirect('/dashboard');
-            } else {
-                res.render('index', {
+                if (results.length === 1) {
+                    req.session.usuario = results[0]; // se guarda el usuario en la sesión
+                    res.redirect('/dashboard');
+                    } else {
+                    res.render('index', {
                     error: "Usuario o contraseña incorrectos ❌"
                 });
             }
@@ -33,7 +35,7 @@ router.post('/', (req, res) => {
 });
 
 // Dashboard
-router.get('/dashboard', (req, res) => {
+router.get('/dashboard', verificarSesion, (req, res) => {
 
     db.query("SELECT COUNT(*) AS totalEmpleados FROM empleados", (err, empResult) => {
         if (err) console.log(err);
@@ -62,7 +64,7 @@ router.get('/dashboard', (req, res) => {
 });
 
 // Empleados
-router.get('/empleados', (req, res) => {
+router.get('/empleados', verificarSesion, (req, res) => {
     db.query("SELECT * FROM empleados", (err, results) => {
         if (err) {
             console.log(err);
@@ -72,7 +74,7 @@ router.get('/empleados', (req, res) => {
     });
 });
 
-router.post('/empleados/add', (req, res) => {
+router.post('/empleados/add', verificarSesion, (req, res) => {
     const { nombre, puesto, salario } = req.body;
     db.query(
         "INSERT INTO empleados (nombre, puesto, salario) VALUES (?, ?, ?)",
@@ -88,7 +90,7 @@ router.post('/empleados/add', (req, res) => {
 });
 
 // Productos
-router.get('/productos', (req, res) => {
+router.get('/productos', verificarSesion, (req, res) => {
     db.query("SELECT * FROM productos", (err, results) => {
         if (err) {
             console.log(err);
@@ -98,7 +100,7 @@ router.get('/productos', (req, res) => {
     });
 });
 
-router.post('/productos/add', (req, res) => {
+router.post('/productos/add', verificarSesion,(req, res) => {
     const { nombre, stock, precio } = req.body;
     db.query(
         "INSERT INTO productos (nombre, stock, precio) VALUES (?, ?, ?)",
@@ -114,7 +116,7 @@ router.post('/productos/add', (req, res) => {
 });
 
 // VENTAS (CORREGIDO)
-router.get('/ventas', (req, res) => {
+router.get('/ventas', verificarSesion, (req, res) => {
 
     db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, ventas) => {
         if (err) {
@@ -138,7 +140,7 @@ router.get('/ventas', (req, res) => {
 });
 
 // AGREGAR VENTA (PRO)
-router.post('/ventas/add', (req, res) => {
+router.post('/ventas/add', verificarSesion, (req, res) => {
     const { cliente, producto, monto, cantidad } = req.body;
 
     db.query("SELECT * FROM productos WHERE nombre = ?", [producto], (err, result) => {
@@ -179,7 +181,7 @@ router.post('/ventas/add', (req, res) => {
 });
 
 // API métricas
-router.get('/api/metricas', (req, res) => {
+router.get('/api/metricas', verificarSesion, (req, res) => {
     db.query("SELECT producto, COUNT(*) as cantidad FROM ventas GROUP BY producto ORDER BY cantidad DESC LIMIT 5", (err, topProductos) => {
         if (err) {
             console.log(err);
@@ -203,6 +205,14 @@ router.get('/api/metricas', (req, res) => {
                 ventasPorDia
             });
         });
+    });
+});
+
+// Esta ruta es para cerrar sesión
+router.get('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.clearCookie('connect.sid');
+        res.redirect('/');
     });
 });
 
