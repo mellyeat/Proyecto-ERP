@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-03-2026 a las 23:19:38
+-- Tiempo de generación: 25-03-2026 a las 01:53:58
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -40,7 +40,8 @@ CREATE TABLE `empleados` (
 
 INSERT INTO `empleados` (`id`, `nombre`, `puesto`, `salario`) VALUES
 (1, 'Juan Pérez', 'Gerente', 15000.00),
-(2, 'Ana López', 'Vendedor', 8000.00);
+(2, 'Ana López', 'Vendedor', 8000.00),
+(3, 'Mario', 'Jefe', 250000.00);
 
 -- --------------------------------------------------------
 
@@ -60,8 +61,8 @@ CREATE TABLE `productos` (
 --
 
 INSERT INTO `productos` (`id`, `nombre`, `stock`, `precio`) VALUES
-(1, 'Laptop', 10, 1200.00),
-(2, 'Mouse', 50, 25.00);
+(1, 'Laptop', 3, 1200.00),
+(2, 'Mouse', 46, 25.00);
 
 -- --------------------------------------------------------
 
@@ -72,15 +73,17 @@ INSERT INTO `productos` (`id`, `nombre`, `stock`, `precio`) VALUES
 CREATE TABLE `usuarios` (
   `id` int(11) NOT NULL,
   `usuario` varchar(50) NOT NULL,
-  `password` varchar(100) NOT NULL
+  `password` varchar(100) NOT NULL,
+  `rol` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `usuario`, `password`) VALUES
-(1, 'admin', '1234');
+INSERT INTO `usuarios` (`id`, `usuario`, `password`, `rol`) VALUES
+(1, 'admin', '1234', 'administrador'),
+(2, 'localadmn', '12345', 'administrador');
 
 -- --------------------------------------------------------
 
@@ -102,7 +105,10 @@ CREATE TABLE `ventas` (
 
 INSERT INTO `ventas` (`id`, `cliente`, `producto`, `monto`, `fecha`) VALUES
 (1, 'Carlos Ruiz', 'Laptop', 1200.00, '2026-02-28 21:42:09'),
-(2, 'María Torres', 'Mouse', 25.00, '2026-02-28 21:42:09');
+(2, 'María Torres', 'Mouse', 25.00, '2026-02-28 21:42:09'),
+(3, 'Edwin', 'Laptop', 3600.00, '2026-03-20 01:34:29'),
+(4, 'Pepe', 'Mouse', 100.00, '2026-03-20 22:53:31'),
+(5, 'dsa', 'Laptop', 4800.00, '2026-03-20 23:22:15');
 
 --
 -- Índices para tablas volcadas
@@ -140,7 +146,7 @@ ALTER TABLE `ventas`
 -- AUTO_INCREMENT de la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
@@ -152,13 +158,13 @@ ALTER TABLE `productos`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
