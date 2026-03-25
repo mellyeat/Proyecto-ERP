@@ -197,7 +197,11 @@ router.post('/ventas/add', verificarSesion, (req, res) => {
                     (err) => {
                         if (err) console.log(err);
 
-                        res.redirect('/ventas');
+                        if (req.body.origen === 'compras') {
+    res.redirect('/compras');
+} else {
+    res.redirect('/ventas');
+}
                     }
                 );
             }

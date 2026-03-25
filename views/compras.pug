@@ -11,7 +11,7 @@ block content
 
   .row.g-4
 
-    // Formulario
+    // ================= FORMULARIO =================
     .col-md-4
       .card-custom
         .card-body.p-0
@@ -23,8 +23,9 @@ block content
           .p-4
             form(action="/ventas/add", method="POST")
 
-              // 👇 CLIENTE AUTOMÁTICO (desde sesión)
-              input(type="hidden", name="cliente", value=usuario ? usuario.nombre : '')
+              // 🔥 IMPORTANTE (BIEN DENTRO DEL FORM)
+              input(type="hidden", name="origen", value="compras")
+              input(type="hidden", name="cliente", value=usuario ? usuario.usuario : '')
 
               .mb-3
                 label.form-label.text-muted.small Producto
@@ -71,7 +72,7 @@ block content
                 i.fa-solid.fa-check.me-2
                 | Comprar ahora
 
-    // Ventas
+    // ================= TABLA =================
     .col-md-8
       .card-custom.h-100
         .card-body.p-0
@@ -104,7 +105,7 @@ block content
                   tr
                     td(colspan="5").text-center.text-muted.p-4 No has comprado nada aún
 
-  // Scripts
+  // ================= SCRIPT =================
   script.
     document.addEventListener('DOMContentLoaded', () => {
       const selectProducto = document.getElementById('producto');
