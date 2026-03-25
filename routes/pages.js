@@ -34,6 +34,7 @@ router.post('/', (req, res) => {
     );
 });
 
+
 // Dashboard
 router.get('/dashboard', verificarSesion, (req, res) => {
 
@@ -131,6 +132,30 @@ router.get('/ventas', verificarSesion, (req, res) => {
             }
 
             res.render('ventas', {
+                ventas: ventas,
+                productos: productos
+            });
+
+        });
+    });
+});
+
+// ================== COMPRAS ==================
+router.get('/compras', verificarSesion, (req, res) => {
+
+    db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, ventas) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error fetching purchases");
+        }
+
+        db.query("SELECT * FROM productos", (err, productos) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error fetching products");
+            }
+
+            res.render('compras', {
                 ventas: ventas,
                 productos: productos
             });
