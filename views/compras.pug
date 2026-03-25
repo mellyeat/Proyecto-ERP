@@ -1,0 +1,134 @@
+extends layout/main.pug
+
+block variables
+  - var activePage = 'compras'
+  - var title = 'Compras - ERP'
+
+block content
+
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Compra tus Productos aquí
+
+  .row.g-4
+
+    // ================= FORMULARIO =================
+    .col-md-4
+      .card-custom
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+              i.fa-solid.fa-cart-shopping.me-2
+              | Comprar
+
+          .p-4
+            form(action="/ventas/add", method="POST")
+
+              // 🔥 IMPORTANTE (BIEN DENTRO DEL FORM)
+              input(type="hidden", name="origen", value="compras")
+              input(type="hidden", name="cliente", value=usuario ? usuario.usuario : '')
+
+              .mb-3
+                label.form-label.text-muted.small Producto
+                select.form-select.bg-light(name="producto", id="producto", required)
+                  option(value="" disabled selected) Elige un producto
+                  each prod in productos
+                    option(
+                      value=prod.nombre
+                      data-precio=prod.precio
+                    ) #{prod.nombre} - $#{prod.precio}
+
+              .mb-3
+                label.form-label.text-muted.small Precio unitario
+                input.form-control.bg-white(
+                  type="text",
+                  id="precio",
+                  readonly
+                )
+
+              .row.mb-3
+                .col-6
+                  label.form-label.text-muted.small Cantidad
+                  input.form-control.bg-light(
+                    type="number",
+                    name="cantidad",
+                    id="cantidad",
+                    min="1",
+                    value="1",
+                    required
+                  )
+
+                .col-6
+                  label.form-label.text-muted.small Total ($)
+                  input.form-control.bg-white.fw-bold(
+                    type="number",
+                    step="0.01",
+                    name="monto",
+                    id="monto",
+                    readonly,
+                    style="color: var(--color-teal);"
+                  )
+
+              button.btn.btn-primary-custom.w-100(type="submit")
+                i.fa-solid.fa-check.me-2
+                | Comprar ahora
+
+    // ================= TABLA =================
+    .col-md-8
+      .card-custom.h-100
+        .card-body.p-0
+
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+              i.fa-solid.fa-box-open.me-2
+              | Tus Productos Comprados
+
+          .table-responsive
+            table.table.table-custom.mb-0
+              thead
+                tr
+                  th ID
+                  th Producto
+                  th Cantidad
+                  th Total
+                  th Fecha
+
+              tbody
+                if ventas && ventas.length > 0
+                  each venta in ventas
+                    tr
+                      td.text-muted ##{venta.id}
+                      td.fw-bold #{venta.producto}
+                      td #{venta.cantidad}
+                      td.fw-bold(style="color: var(--color-teal);") $#{venta.monto}
+                      td.small.text-muted #{new Date(venta.fecha).toLocaleString()}
+                else
+                  tr
+                    td(colspan="5").text-center.text-muted.p-4 No has comprado nada aún
+
+  // ================= SCRIPT =================
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      const selectProducto = document.getElementById('producto');
+      const inputMonto = document.getElementById('monto');
+      const inputCantidad = document.getElementById('cantidad');
+      const inputPrecio = document.getElementById('precio');
+
+      function actualizarTotal() {
+        const selectedOption = selectProducto.options[selectProducto.selectedIndex];
+        const precio = selectedOption ? selectedOption.dataset.precio : null;
+        const cantidad = inputCantidad.value;
+
+        if (precio) {
+          inputPrecio.value = `$${precio}`;
+        }
+
+        if (precio && cantidad) {
+          inputMonto.value = (precio * cantidad).toFixed(2);
+        } else {
+          inputMonto.value = '';
+        }
+      }
+
+      selectProducto.addEventListener('change', actualizarTotal);
+      inputCantidad.addEventListener('input', actualizarTotal);
+    });

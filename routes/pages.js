@@ -68,6 +68,7 @@ router.post('/registro', (req, res) => {
         }
     );
 }); 
+
 // Dashboard
 router.get('/dashboard', verificarSesion, (req, res) => {
 
@@ -173,6 +174,30 @@ router.get('/ventas', verificarSesion, (req, res) => {
     });
 });
 
+// ================== COMPRAS ==================
+router.get('/compras', verificarSesion, (req, res) => {
+
+    db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, ventas) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error fetching purchases");
+        }
+
+        db.query("SELECT * FROM productos", (err, productos) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error fetching products");
+            }
+
+            res.render('compras', {
+                ventas: ventas,
+                productos: productos
+            });
+
+        });
+    });
+});
+
 // AGREGAR VENTA (PRO)
 router.post('/ventas/add', verificarSesion, (req, res) => {
     const { cliente, producto, monto, cantidad } = req.body;
@@ -206,7 +231,11 @@ router.post('/ventas/add', verificarSesion, (req, res) => {
                     (err) => {
                         if (err) console.log(err);
 
-                        res.redirect('/ventas');
+                        if (req.body.origen === 'compras') {
+    res.redirect('/compras');
+} else {
+    res.redirect('/ventas');
+}
                     }
                 );
             }
