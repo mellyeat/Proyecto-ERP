@@ -1,26 +1,27 @@
 doctype html
 html(lang="es")
   head
-    title Login ERP
+    title Registro ERP
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1")
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css")
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
     link(rel="stylesheet", href="/css/style.css")
+    script(src="https://cdn.jsdelivr.net/npm/sweetalert2@11")
+    
   body(style="background-color: var(--color-bg);")
 
     .container.d-flex.justify-content-center.align-items-center.min-vh-100
       .card.shadow-lg.login-card.bg-white(style="width:380px")
         .card-body.p-4
+
           .text-center.mb-4
-            i.fa-solid.fa-chart-pie(style="color: var(--color-dark-teal); font-size: 3rem;").mb-2
-            h3.fw-bold(style="color: var(--color-dark-teal);") Mini ERP
-            p.text-muted.small Ingresa tus credenciales
+            i.fa-solid.fa-user-plus(style="color: var(--color-dark-teal); font-size: 3rem;").mb-2
+            h3.fw-bold(style="color: var(--color-dark-teal);") Registro
+            p.text-muted.small Crea tu cuenta
 
-          if error
-            .alert.alert-danger.text-center.small #{error}
+          form(method="POST", action="/registro")
 
-          form(method="POST", action="/")
             .mb-3
               label.form-label.text-muted.small Usuario
               .input-group
@@ -36,9 +37,18 @@ html(lang="es")
                 input.form-control.border-start-0.bg-light(type="password", name="password", required)
 
             button.btn.btn-primary-custom.w-100.mt-3(type="submit") 
-              | Entrar
+              | Registrarse
               i.fa-solid.fa-arrow-right.ms-2
-          .mt-2.text-center
-             a.text-decoration-none.small(href="/registro")
-              | ¿No tienes cuenta? 
-              span.fw-bold Regístrate aquí
+
+          .mt-3.text-center
+            a.text-decoration-none.small(href="/") 
+              | ¿Ya tienes cuenta? 
+              span.fw-bold Inicia sesión
+
+    if error
+      script.
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: '#{error}'
+        });
