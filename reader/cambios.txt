@@ -1,0 +1,6 @@
+-admin solo da alta users (quitar registro, admin define roles de usuario)
+-quitar compras hacer crud dentro de productos
+-rh (empleados-crud) 
+ventas(generador de reportes o facturas) y compras(agregar modulo de clientes)
+admin (ve todo y agg, agregar apartado de proveedores)
+-agregar notificación de stock bajo (ventas, compras y admin ven noti)
