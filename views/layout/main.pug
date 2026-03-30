@@ -41,11 +41,31 @@ html(lang="es")
 
             li.nav-item
               a.nav-link.sidebar-link(
-                href="/productos", 
+                data-bs-toggle="collapse",
+                href="#productosMenu",
+                role="button",
+                aria-expanded=(activePage === 'productos' ? 'true' : 'false'),
+                aria-controls="productosMenu",
                 class=(activePage === 'productos' ? 'active' : '')
               )
                 i.fa-solid.fa-box-open.me-2
                 | Productos
+                i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
+              
+              .collapse(id="productosMenu", class=(activePage === 'productos' ? 'show' : ''))
+                ul.nav.flex-column.ms-3.mt-2
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/productos") 
+                      i.fa-solid.fa-chart-simple.me-2
+                      | Resumen
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/productos/altas") 
+                      i.fa-solid.fa-plus-circle.me-2
+                      | Nuevo Producto
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/productos/consultas")
+                      i.fa-solid.fa-list.me-2
+                      | Inventario
 
             li.nav-item
               a.nav-link.sidebar-link(

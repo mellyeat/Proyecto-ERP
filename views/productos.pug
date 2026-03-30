@@ -2,61 +2,127 @@ extends layout/main.pug
 
 block variables
   - var activePage = 'productos'
-  - var title = 'Productos - ERP'
+  - var title = 'Resumen de Productos - ERP'
 
 block content
-
   .d-flex.justify-content-between.align-items-center.mb-4
-    h2.fw-bold(style="color: var(--color-dark-teal);") Gestión de Productos
+    h2.fw-bold(style="color: var(--color-dark-teal);") Resumen del Inventario
 
+  //- Tarjetas de Métricas Generales (Esqueleto)
+  .row.g-4.mb-4
+    .col-md-3
+      .card-custom.bg-primary.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 Total Registros
+            h3.fw-bold.mb-0 145
+          i.fa-solid.fa-box-open.fs-1.opacity-50
+          
+    .col-md-3
+      .card-custom.bg-success.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 En Stock
+            h3.fw-bold.mb-0 1,230
+          i.fa-solid.fa-boxes-stacked.fs-1.opacity-50
+          
+    .col-md-3
+      .card-custom.bg-warning.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 Próximos a Agotarse
+            h3.fw-bold.mb-0 12
+          i.fa-solid.fa-triangle-exclamation.fs-1.opacity-50
+          
+    .col-md-3
+      .card-custom.bg-danger.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 Sin Stock
+            h3.fw-bold.mb-0 3
+          i.fa-solid.fa-circle-xmark.fs-1.opacity-50
+
+  //- Tabla y Gráfico (Esqueleto)
   .row.g-4
-    .col-md-4
-      .card-custom
-        .card-body.p-0
-          .p-3.border-bottom
-            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
-              i.fa-solid.fa-plus-circle.me-2
-              | Agregar Producto
-          .p-4
-            form(action="/productos/add", method="POST")
-              .mb-3
-                label.form-label.text-muted.small Nombre del Producto
-                input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Teclado Mecánico", required)
-              .mb-3
-                label.form-label.text-muted.small Stock Disponible
-                input.form-control.bg-light(type="number", name="stock", placeholder="Ej: 50", required)
-              .mb-3
-                label.form-label.text-muted.small Precio Unitario ($)
-                input.form-control.bg-light(type="number", step="0.01", name="precio", placeholder="Ej: 25.50", required)
-              button.btn.btn-primary-custom.w-100(type="submit") Añadir Producto
-
     .col-md-8
       .card-custom.h-100
         .card-body.p-0
-          .p-3.border-bottom
+          .p-3.border-bottom.d-flex.justify-content-between.align-items-center
             h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
-              i.fa-solid.fa-boxes-stacked.me-2
-              | Inventario
+              i.fa-solid.fa-arrow-trend-down.me-2
+              | Productos con Bajo Stock
+            a.btn.btn-sm.btn-outline-custom(href="/productos/consultas") Ver Inventario Completo
           .table-responsive
             table.table.table-custom.mb-0
               thead
                 tr
                   th ID
                   th Producto
-                  th Stock
-                  th Precio
+                  th Stock Actual
+                  th Estado
               tbody
-                if productos && productos.length > 0
-                  each prod in productos
-                    tr
-                      td.text-muted ##{prod.id}
-                      td.fw-bold #{prod.nombre}
-                      td
-                        if prod.stock < 10
-                          span.badge.bg-danger #{prod.stock} (Bajo)
-                        else
-                          span.badge.bg-success #{prod.stock}
-                      td.fw-bold(style="color: var(--color-teal);") $#{prod.precio}
-                else
-                  tr
-                    td(colspan="4").text-center.text-muted.p-4 No hay productos registrados
+                tr
+                  td.text-muted #001
+                  td.fw-bold Teclado Mecánico RGB
+                  td 5
+                  td
+                    span.badge.bg-danger Crítico
+                tr
+                  td.text-muted #045
+                  td.fw-bold Monitor 24" 144Hz
+                  td 8
+                  td
+                    span.badge.bg-warning.text-dark Riesgo
+                tr
+                  td.text-muted #023
+                  td.fw-bold Mouse Inalámbrico
+                  td 12
+                  td
+                    span.badge.bg-warning.text-dark Riesgo
+
+    .col-md-4
+      .card-custom.h-100
+        .card-body.p-0.d-flex.flex-column
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+              i.fa-solid.fa-chart-pie.me-2
+              | Distribución de Inventario
+          .p-4.flex-grow-1.d-flex.justify-content-center.align-items-center
+            canvas#inventoryChart(style="max-height: 250px; width: 100%;")
+
+block scripts
+  script(src="https://cdn.jsdelivr.net/npm/chart.js")
+  script.
+    document.addEventListener("DOMContentLoaded", function() {
+      const ctx = document.getElementById('inventoryChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['En Stock', 'Bajo Stock', 'Agotado'],
+          datasets: [{
+            data: [1230, 12, 3],
+            backgroundColor: [
+              '#198754', // success
+              '#ffc107', // warning
+              '#dc3545'  // danger
+            ],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 15
+              }
+            }
+          }
+        }
+      });
+    });

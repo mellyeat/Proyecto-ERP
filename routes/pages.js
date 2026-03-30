@@ -134,14 +134,28 @@ router.post('/empleados/add', verificarSesion, (req, res) => {
 
 // Productos
 router.get('/productos', verificarSesion, (req, res) => {
+    res.render('productos');
+});
+
+router.get('/productos/consultas', verificarSesion, (req, res) => {
     db.query("SELECT * FROM productos", (err, results) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Error fetching products");
         }
-        res.render('productos', { productos: results });
+        res.render('productos/consultas', { productos: results });
     });
 });
+
+router.get('/productos/altas', verificarSesion, (req, res) => {
+    res.render('productos/altas');
+});
+
+router.get('/productos/cambios', verificarSesion, (req, res) => {
+    res.render('productos/cambios');
+});
+
+
 
 router.post('/productos/add', verificarSesion,(req, res) => {
     const { nombre, stock, precio } = req.body;
