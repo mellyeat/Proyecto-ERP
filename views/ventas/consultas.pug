@@ -1,0 +1,46 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'ventas'
+  - var title = 'Historial de Ventas - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Historial de Ventas
+
+  .card-custom.h-100
+    .card-body.p-0
+      .p-3.border-bottom
+        h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+          i.fa-solid.fa-clock-rotate-left.me-2
+          | Registro Histórico
+      .table-responsive
+        table.table.table-custom.mb-0
+          thead
+            tr
+              th ID
+              th Cliente
+              th Producto
+              th Monto
+              th Fecha
+              th Acciones
+          tbody
+            if ventas && ventas.length > 0
+              each venta in ventas
+                tr
+                  td.text-muted ##{venta.id}
+                  td.fw-bold #{venta.cliente}
+                  td #{venta.producto}
+                  td.fw-bold(style="color: var(--color-teal);") $#{venta.monto}
+                  td.small.text-muted #{new Date(venta.fecha).toLocaleString()}
+                  td
+                    .d-flex.gap-2
+                      a.btn.btn-sm.btn-outline-custom(href=`/ventas/ticket?id=${venta.id}`, title="Ver Ticket (POS)")
+                        i.fa-solid.fa-receipt.me-1
+                        | Ticket
+                      a.btn.btn-sm.btn-outline-custom(href=`/ventas/factura-view?id=${venta.id}`, title="Ver Factura en PDF a tamaño real")
+                        i.fa-solid.fa-file-pdf.me-1
+                        | Factura
+            else
+              tr
+                td(colspan="6").text-center.text-muted.p-4 No hay ventas registradas

@@ -1,0 +1,50 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'ventas'
+  - var title = 'Facturación - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Todas las Facturas Generadas
+
+  .card-custom
+    .card-body.p-0
+      .p-3.border-bottom
+        h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+          i.fa-solid.fa-file-invoice.me-2
+          | Archivo Fiscal
+      .table-responsive
+        table.table.table-custom.mb-0
+          thead
+            tr
+              th Folio Fiscal
+              th Cliente
+              th Fecha Emisión
+              th Monto
+              th Estado
+              th Acciones
+          tbody
+            //- Esqueleto de datos
+            tr
+              td.fw-bold.text-muted #INV-2026-0085
+              td Empresa ACME S.A.
+              td.small.text-muted 30/03/2026
+              td.fw-bold(style="color: var(--color-teal);") $487.20
+              td
+                span.badge.bg-success Pagada
+              td
+                a.btn.btn-sm.btn-outline-custom(href="/ventas/factura-view?id=85", title="Ver Factura en A4")
+                  i.fa-solid.fa-eye.me-1
+                  | PDF
+            tr
+              td.fw-bold.text-muted #INV-2026-0084
+              td Servicios Digitales LLC
+              td.small.text-muted 29/03/2026
+              td.fw-bold(style="color: var(--color-teal);") $1,250.00
+              td
+                span.badge.bg-warning.text-dark Pendiente
+              td
+                a.btn.btn-sm.btn-outline-custom(href="/ventas/factura-view?id=84", title="Ver Factura en A4")
+                  i.fa-solid.fa-eye.me-1
+                  | PDF

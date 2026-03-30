@@ -69,19 +69,43 @@ html(lang="es")
 
             li.nav-item
               a.nav-link.sidebar-link(
-                href="/ventas", 
+                data-bs-toggle="collapse",
+                href="#ventasMenu",
+                role="button",
+                aria-expanded=(activePage === 'ventas' ? 'true' : 'false'),
+                aria-controls="ventasMenu",
                 class=(activePage === 'ventas' ? 'active' : '')
               )
                 i.fa-solid.fa-money-bill-wave.me-2
                 | Ventas
+                i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
+              
+              .collapse(id="ventasMenu", class=(activePage === 'ventas' ? 'show' : ''))
+                ul.nav.flex-column.ms-3.mt-2
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/ventas") 
+                      i.fa-solid.fa-chart-simple.me-2
+                      | Resumen
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/ventas/altas") 
+                      i.fa-solid.fa-plus-circle.me-2
+                      | Nueva Venta
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/ventas/consultas")
+                      i.fa-solid.fa-list.me-2
+                      | Historial
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/ventas/facturas")
+                      i.fa-solid.fa-file-invoice.me-2
+                      | Facturas
 
             li.nav-item
               a.nav-link.sidebar-link(
                 href="/compras", 
                 class=(activePage === 'compras' ? 'active' : '')
               )
-                i.fa-solid.fa-cart-shopping.me-2
-                | Compras
+                i.fa-solid.fa-users.me-2
+                | Clientes
 
           .mt-auto.p-3
             .text-center.text-white-50.small

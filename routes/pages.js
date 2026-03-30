@@ -166,26 +166,39 @@ router.post('/productos/add', verificarSesion,(req, res) => {
 
 // VENTAS (CORREGIDO)
 router.get('/ventas', verificarSesion, (req, res) => {
+    res.render('ventas');
+});
 
+router.get('/ventas/altas', verificarSesion, (req, res) => {
+    db.query("SELECT * FROM productos", (err, productos) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error fetching products");
+        }
+        res.render('ventas/altas', { productos: productos });
+    });
+});
+
+router.get('/ventas/consultas', verificarSesion, (req, res) => {
     db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, ventas) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Error fetching sales");
         }
-
-        db.query("SELECT * FROM productos", (err, productos) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).send("Error fetching products");
-            }
-
-            res.render('ventas', {
-                ventas: ventas,
-                productos: productos
-            });
-
-        });
+        res.render('ventas/consultas', { ventas: ventas });
     });
+});
+
+router.get('/ventas/facturas', verificarSesion, (req, res) => {
+    res.render('ventas/facturas');
+});
+
+router.get('/ventas/factura-view', verificarSesion, (req, res) => {
+    res.render('ventas/factura-view');
+});
+
+router.get('/ventas/ticket', verificarSesion, (req, res) => {
+    res.render('ventas/ticket');
 });
 
 // ================== COMPRAS ==================

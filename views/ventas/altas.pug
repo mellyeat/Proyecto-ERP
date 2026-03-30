@@ -1,0 +1,86 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'ventas'
+  - var title = 'Nueva Venta - ERP'
+
+block content
+
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Registrar Nueva Venta
+
+  .row
+    .col-md-6.mx-auto
+      .card-custom
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+              i.fa-solid.fa-cart-shopping.me-2
+              | Detalles de la Venta
+          .p-4
+            form(action="/ventas/add", method="POST")
+              .mb-3
+                label.form-label.text-muted.small Nombre del Cliente
+                input.form-control.bg-light(type="text", name="cliente", placeholder="Ej: Empresa ACME", required)
+
+              .mb-3
+                label.form-label.text-muted.small Seleccionar Producto
+                select.form-select.bg-light(name="producto", id="producto", required)
+                  option(value="" disabled selected) Elige un producto
+                  if productos && productos.length > 0
+                    each prod in productos
+                      option(
+                        value=prod.nombre
+                        data-precio=prod.precio
+                      ) #{prod.nombre} - $#{prod.precio}
+                  else
+                    option(value="" disabled) No hay productos disponibles
+
+              .row.mb-3
+                .col-6
+                  label.form-label.text-muted.small Cantidad
+                  input.form-control.bg-light(
+                    type="number",
+                    name="cantidad",
+                    id="cantidad",
+                    min="1",
+                    value="1",
+                    required
+                  )
+                .col-6
+                  label.form-label.text-muted.small Total ($)
+                  input.form-control.bg-white.fw-bold(
+                    type="number",
+                    step="0.01",
+                    name="monto",
+                    id="monto",
+                    required,
+                    readonly,
+                    style="color: var(--color-teal);"
+                  )
+
+              button.btn.btn-primary-custom.w-100(type="submit") Confirmar Venta
+
+block scripts
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      const selectProducto = document.getElementById('producto');
+      const inputMonto = document.getElementById('monto');
+      const inputCantidad = document.getElementById('cantidad');
+
+      function actualizarTotal() {
+        if(!selectProducto || !inputMonto || !inputCantidad) return;
+        const selectedOption = selectProducto.options[selectProducto.selectedIndex];
+        const precio = selectedOption ? selectedOption.dataset.precio : null;
+        const cantidad = inputCantidad.value;
+
+        if (precio && cantidad) {
+          inputMonto.value = (precio * cantidad).toFixed(2);
+        } else {
+          inputMonto.value = '';
+        }
+      }
+
+      if(selectProducto) selectProducto.addEventListener('change', actualizarTotal);
+      if(inputCantidad) inputCantidad.addEventListener('input', actualizarTotal);
+    });
