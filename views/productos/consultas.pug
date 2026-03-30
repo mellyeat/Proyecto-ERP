@@ -1,0 +1,47 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'productos'
+  - var title = 'Inventario de Productos - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Inventario de Productos
+
+  .card-custom
+    .card-body.p-0
+      .p-3.border-bottom
+        h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+          i.fa-solid.fa-boxes-stacked.me-2
+          | Listado de Productos
+      .table-responsive
+        table.table.table-custom.mb-0
+          thead
+            tr
+              th ID
+              th Producto
+              th Stock
+              th Precio
+              th Acciones
+          tbody
+            if productos && productos.length > 0
+              each prod in productos
+                tr
+                  td.text-muted ##{prod.id}
+                  td.fw-bold #{prod.nombre}
+                  td
+                    if prod.stock < 10
+                      span.badge.bg-danger #{prod.stock} (Bajo)
+                    else
+                      span.badge.bg-success #{prod.stock}
+                  td.fw-bold(style="color: var(--color-teal);") $#{prod.precio}
+                  td
+                    .d-flex.gap-2
+                      a.btn.btn-sm.btn-warning(href=`/productos/cambios?id=${prod.id}`, title="Editar")
+                        i.fa-solid.fa-pencil
+                      form(action=`/productos/delete/${prod.id}`, method="POST", style="margin: 0;")
+                        button.btn.btn-sm.btn-danger(type="submit", title="Eliminar")
+                          i.fa-solid.fa-trash
+            else
+              tr
+                td(colspan="5").text-center.text-muted.p-4 No hay productos registrados

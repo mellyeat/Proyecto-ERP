@@ -1,0 +1,30 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'productos'
+  - var title = 'Alta de Productos - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Alta de Productos
+
+  .row
+    .col-md-6.mx-auto
+      .card-custom
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+              i.fa-solid.fa-plus-circle.me-2
+              | Agregar Producto
+          .p-4
+            form(action="/productos/add", method="POST")
+              .mb-3
+                label.form-label.text-muted.small Nombre del Producto
+                input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Teclado Mecánico", required)
+              .mb-3
+                label.form-label.text-muted.small Stock Disponible
+                input.form-control.bg-light(type="number", name="stock", placeholder="Ej: 50", required)
+              .mb-3
+                label.form-label.text-muted.small Precio Unitario ($)
+                input.form-control.bg-light(type="number", step="0.01", name="precio", placeholder="Ej: 25.50", required)
+              button.btn.btn-primary-custom.w-100(type="submit") Añadir Producto
