@@ -1,0 +1,73 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'productos'
+  - var title = 'Añadir Proveedor - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Registrar Proveedor
+    a.btn.btn-outline-secondary(href="/productos/proveedores")
+      i.fa-solid.fa-arrow-left.me-2
+      | Volver al Directorio
+
+  form(action="/productos/proveedor-add", method="POST")
+    .row.g-4
+      //- SECCIÓN 1: Datos de la Empresa
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-building.me-2
+                | 1. Datos de la Empresa
+            .p-4
+              .mb-3
+                label.form-label.text-muted.small Nombre Comercial o Razón Social
+                input.form-control.bg-light(type="text", name="empresa", placeholder="Ej: TechSupplies Inc.", required)
+              
+              .mb-3
+                label.form-label.text-muted.small RFC Fiscal
+                input.form-control.bg-light.text-uppercase(type="text", name="rfc", placeholder="Opcional pero recomendado", maxlength="13")
+
+              .mb-3
+                label.form-label.text-muted.small Categoría Principal
+                select.form-select.bg-light(name="categoria")
+                  option(value="" disabled selected) Seleccionar...
+                  option(value="electronica") Electrónica de Consumo
+                  option(value="perifericos") Periféricos / Accesorios
+                  option(value="software") Mayorista de Software
+                  option(value="oficina") Mobiliario de Oficina
+                  option(value="otro") Otro rubro logístico
+
+      //- SECCIÓN 2: Persona de Contacto
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-address-card.me-2
+                | 2. Contacto Administrativo / Ventas
+
+            .p-4
+              .mb-3
+                label.form-label.text-muted.small Nombre del Contacto
+                input.form-control.bg-light(type="text", name="contacto", placeholder="Ej: Lic. Antonio Aguilar", required)
+
+              .row.mb-3
+                .col-md-6
+                  label.form-label.text-muted.small Teléfono Celular / Oficina
+                  input.form-control.bg-light(type="tel", name="telefono", placeholder="(555) 123-4567")
+                .col-md-6
+                  label.form-label.text-muted.small Extensión
+                  input.form-control.bg-light(type="text", name="ext", placeholder="Ej: 104")
+
+              .mb-3
+                label.form-label.text-muted.small Correo Electrónico Comercial
+                input.form-control.bg-light(type="email", name="email", placeholder="ventas@techsupplies.com", required)
+
+    .row.mt-4
+      .col-12.text-end
+        button.btn.btn-primary-custom.px-5.py-2(type="submit")
+          i.fa-solid.fa-truck-arrow-right.me-2
+          | Confirmar Alta de Proveedor

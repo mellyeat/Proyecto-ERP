@@ -66,6 +66,10 @@ html(lang="es")
                     a.nav-link.sidebar-link.small.py-1(href="/productos/consultas")
                       i.fa-solid.fa-list.me-2
                       | Inventario
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/productos/proveedores")
+                      i.fa-solid.fa-truck-fast.me-2
+                      | Proveedores
 
             li.nav-item
               a.nav-link.sidebar-link(
@@ -101,20 +105,38 @@ html(lang="es")
 
             li.nav-item
               a.nav-link.sidebar-link(
-                href="/compras", 
-                class=(activePage === 'compras' ? 'active' : '')
+                data-bs-toggle="collapse",
+                href="#clientesMenu",
+                role="button",
+                aria-expanded=(activePage === 'clientes' ? 'true' : 'false'),
+                aria-controls="clientesMenu",
+                class=(activePage === 'clientes' ? 'active' : '')
               )
                 i.fa-solid.fa-users.me-2
                 | Clientes
+                i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
+              
+              .collapse(id="clientesMenu", class=(activePage === 'clientes' ? 'show' : ''))
+                ul.nav.flex-column.ms-3.mt-2
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/clientes") 
+                      i.fa-solid.fa-chart-simple.me-2
+                      | Resumen
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/clientes/altas") 
+                      i.fa-solid.fa-user-plus.me-2
+                      | Nuevo Cliente
+                  li.nav-item
+                    a.nav-link.sidebar-link.small.py-1(href="/clientes/consultas")
+                      i.fa-solid.fa-address-book.me-2
+                      | Directorio
 
           .mt-auto.p-3
             .text-center.text-white-50.small
               | © 2026 ERP System
 
-        // ================= MAIN =================
         .col-md-10.d-flex.flex-column.min-vh-100
 
-          // Navbar Top
           nav.navbar.navbar-expand-lg.top-navbar.d-flex.justify-content-between.align-items-center
             span.navbar-brand.fs-5.text-muted Hola, Bienvenido
 
@@ -123,7 +145,6 @@ html(lang="es")
                 i.fa-solid.fa-arrow-right-from-bracket.me-2
                 | Cerrar sesión
 
-          // Content
           .p-4.flex-grow-1
             block content
 

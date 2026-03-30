@@ -1,0 +1,81 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'clientes'
+  - var title = 'Directorio de Clientes - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Control de Clientes
+    a.btn.btn-primary-custom(href="/clientes/altas")
+      i.fa-solid.fa-plus.me-2
+      | Registrar Cliente
+
+  .card-custom.h-100
+    .card-body.p-0
+      .p-3.border-bottom.d-flex.justify-content-between.align-items-center
+        h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+          i.fa-solid.fa-users-rectangle.me-2
+          | Directorio Comercial
+        .input-group(style="width: 250px;")
+          input.form-control.form-control-sm(type="text", placeholder="Buscar cliente o RFC...")
+          button.btn.btn-outline-secondary.btn-sm
+            i.fa-solid.fa-search
+            
+      .table-responsive
+        table.table.table-custom.mb-0.align-middle
+          thead
+            tr
+              th Cliente / Comercial
+              th RFC y Facturación
+              th Contacto Principal
+              th Saldo Pendiente
+              th Acciones
+          tbody
+            //- Datos Simulados
+            tr
+              td
+                .fw-bold Empresa ACME S.A.
+                .small.text-muted Cliente Activo
+              td
+                .fw-bold.text-uppercase(style="color: var(--color-dark-teal);") XAXX010101000
+                .small.text-muted Av. Principal 456
+              td
+                .small
+                  i.fa-solid.fa-envelope.me-1.text-muted
+                  | contacto@empresa.com
+                .small
+                  i.fa-solid.fa-phone.me-1.text-muted
+                  | (123) 456-7890
+              td.fw-bold(style="color: var(--color-teal);") $0.00
+              td
+                .d-flex.gap-2
+                  a.btn.btn-sm.btn-warning(href="/clientes/cambios?id=1", title="Editar Perfil")
+                    i.fa-solid.fa-pencil
+                  //- Este es el botón "apartado para crear factura" del que se habló
+                  a.btn.btn-sm.btn-success(href="/ventas/factura-view", title="Emitir Nueva Factura Libre")
+                    i.fa-solid.fa-file-invoice-dollar.me-1
+                    | Facturar
+                    
+            tr
+              td
+                .fw-bold Servicios Digitales LLC
+                .small.text-muted Cliente Activo
+              td
+                .fw-bold.text-uppercase(style="color: var(--color-dark-teal);") YBYY020202111
+                .small.text-muted Blvd Tecnológico 85
+              td
+                .small
+                  i.fa-solid.fa-envelope.me-1.text-muted
+                  | admin@serviciosdig.mx
+                .small
+                  i.fa-solid.fa-phone.me-1.text-muted
+                  | (555) 987-6543
+              td.fw-bold.text-danger $1,250.00
+              td
+                .d-flex.gap-2
+                  a.btn.btn-sm.btn-warning(href="/clientes/cambios?id=2", title="Editar Perfil")
+                    i.fa-solid.fa-pencil
+                  a.btn.btn-sm.btn-success(href="/ventas/factura-view", title="Emitir Nueva Factura Libre")
+                    i.fa-solid.fa-file-invoice-dollar.me-1
+                    | Facturar

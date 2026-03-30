@@ -1,0 +1,100 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'clientes'
+  - var title = 'Nuevo Cliente - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Registro de Nuevo Cliente
+    a.btn.btn-outline-secondary(href="/clientes/consultas")
+      i.fa-solid.fa-arrow-left.me-2
+      | Volver al Directorio
+
+  form(action="/clientes/add", method="POST")
+    .row.g-4
+      //- SECCIÓN 1: Datos de Contacto
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-address-book.me-2
+                | 1. Datos de Contacto
+            .p-4
+              .mb-3
+                label.form-label.text-muted.small Nombre Comercial o Etiqueta
+                input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Empresa ACME", required)
+              
+              .mb-3
+                label.form-label.text-muted.small Nombre del Contacto Principal
+                input.form-control.bg-light(type="text", name="contacto", placeholder="Ej: Juan Pérez")
+
+              .row.mb-3
+                .col-md-6
+                  label.form-label.text-muted.small Teléfono
+                  input.form-control.bg-light(type="tel", name="telefono", placeholder="(123) 456-7890")
+                .col-md-6
+                  label.form-label.text-muted.small Correo Electrónico
+                  input.form-control.bg-light(type="email", name="email", placeholder="contacto@empresa.com", required)
+
+      //- SECCIÓN 2: Datos de Facturación (Alineado con facturas.pug)
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom.d-flex.justify-content-between.align-items-center
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-file-invoice-dollar.me-2
+                | 2. Perfil de Facturación
+              .form-check.form-switch
+                input.form-check-input#requiereFactura(type="checkbox", checked)
+                label.form-check-label.small.text-muted(for="requiereFactura") Req. Factura
+
+            .p-4#seccionFacturacion
+              .mb-3
+                label.form-label.text-muted.small Razón Social / FACTURADO A:
+                input.form-control.bg-light(type="text", name="razon_social", placeholder="Ej: Empresa ACME S.A.")
+
+              .mb-3
+                label.form-label.text-muted.small RFC
+                input.form-control.bg-light.text-uppercase(type="text", name="rfc", placeholder="XAXX010101000", maxlength="13")
+
+              .mb-3
+                label.form-label.text-muted.small Dirección Fiscal Completa
+                textarea.form-control.bg-light(name="direccion", rows="2", placeholder="Av. Principal 456, Corporativo VIP, Ciudad")
+
+              .row
+                .col-md-6
+                  label.form-label.text-muted.small Código Postal
+                  input.form-control.bg-light(type="text", name="cp", placeholder="12345", maxlength="5")
+                .col-md-6
+                  label.form-label.text-muted.small Régimen Fiscal
+                  select.form-select.bg-light(name="regimen")
+                    option(value="" disabled selected) Seleccionar...
+                    option(value="601") General de Ley Personas Morales
+                    option(value="612") Personas Físicas con Actividades...
+                    option(value="626") RESICO
+
+    .row.mt-4
+      .col-12.text-end
+        button.btn.btn-primary-custom.px-5.py-2(type="submit")
+          i.fa-solid.fa-save.me-2
+          | Guardar Cliente Completo
+
+block scripts
+  script.
+    // Lógica simple de vista para esconder/mostrar sección fiscal
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggleFactura = document.getElementById('requiereFactura');
+      const seccionFacturacion = document.getElementById('seccionFacturacion');
+      
+      toggleFactura.addEventListener('change', function() {
+        if(this.checked) {
+          seccionFacturacion.style.opacity = '1';
+          seccionFacturacion.style.pointerEvents = 'auto';
+        } else {
+          seccionFacturacion.style.opacity = '0.3';
+          seccionFacturacion.style.pointerEvents = 'none';
+        }
+      });
+    });

@@ -1,0 +1,115 @@
+extends layout/main.pug
+
+block variables
+  - var activePage = 'clientes'
+  - var title = 'Resumen de Clientes - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Panel de Clientes
+
+  //- Tarjetas de Métricas de Clientes
+  .row.g-4.mb-4
+    .col-md-3
+      .card-custom.bg-primary.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 Clientes Totales
+            h3.fw-bold.mb-0 145
+          i.fa-solid.fa-users.fs-1.opacity-50
+          
+    .col-md-3
+      .card-custom.bg-success.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 Nuevos (Mes)
+            h3.fw-bold.mb-0 +12
+          i.fa-solid.fa-user-plus.fs-1.opacity-50
+          
+    .col-md-3
+      .card-custom.bg-warning.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 Con Datos Fiscales
+            h3.fw-bold.mb-0 98
+          i.fa-solid.fa-file-invoice.fs-1.opacity-50
+          
+    .col-md-3
+      .card-custom.bg-info.text-white.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-white-50.mb-1 Tasa de Retención
+            h3.fw-bold.mb-0 85%
+          i.fa-solid.fa-hand-holding-heart.fs-1.opacity-50
+
+  //- Gráficas y Resumen Adicional
+  .row.g-4
+    .col-md-8
+      .card-custom.h-100
+        .card-body.p-0.d-flex.flex-column
+          .p-3.border-bottom.d-flex.justify-content-between.align-items-center
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+              i.fa-solid.fa-chart-area.me-2
+              | Adquisición de Clientes
+          .p-4.flex-grow-1.d-flex.justify-content-center.align-items-center
+            canvas#clientsChart(style="max-height: 250px; width: 100%;")
+
+    .col-md-4
+      .card-custom.h-100
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+              i.fa-solid.fa-crown.me-2
+              | Clientes Top (Por Ventas)
+          .p-3
+            ul.list-group.list-group-flush
+              li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
+                span.fw-bold Empresa ACME S.A.
+                span.badge.bg-success.rounded-pill Nivel Oro
+              li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
+                span.fw-bold Corporativo XYZ
+                span.badge.bg-primary.rounded-pill Nivel Plata
+              li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
+                span.fw-bold Servicios Digitales LLC
+                span.badge.bg-warning.text-dark.rounded-pill Nivel Bronce
+
+block scripts
+  script(src="https://cdn.jsdelivr.net/npm/chart.js")
+  script.
+    document.addEventListener("DOMContentLoaded", function() {
+      const ctx = document.getElementById('clientsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Oct', 'Nov', 'Dic', 'Ene', 'Feb', 'Mar'],
+          datasets: [{
+            label: 'Nuevos Clientes',
+            data: [5, 8, 12, 10, 15, 12],
+            backgroundColor: 'rgba(32, 201, 151, 0.8)', // var(--color-teal)
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0,0,0,0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    });

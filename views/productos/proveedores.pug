@@ -1,0 +1,108 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'productos'
+  - var title = 'Directorio de Proveedores - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Control de Proveedores
+    a.btn.btn-primary-custom(href="/productos/proveedor-altas")
+      i.fa-solid.fa-plus.me-2
+      | Añadir Proveedor
+
+  .row.mb-4
+    .col-md-12
+      .card-custom
+        .card-body.p-0
+          .p-3.border-bottom.d-flex.justify-content-between.align-items-center
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+              i.fa-solid.fa-truck-fast.me-2
+              | Proveedores Registrados
+            .input-group(style="width: 250px;")
+              input.form-control.form-control-sm(type="text", placeholder="Buscar proveedor...")
+              button.btn.btn-outline-secondary.btn-sm
+                i.fa-solid.fa-search
+                
+          .table-responsive
+            table.table.table-custom.mb-0.align-middle
+              thead
+                tr
+                  th ID
+                  th Proveedor
+                  th Contacto
+                  th Artículos Surtidos
+                  th Estado
+                  th Acciones
+              tbody
+                //- Proveedor 1
+                tr
+                  td.text-muted #PRV-001
+                  td
+                    .fw-bold Empresa ACME S.A.
+                    .small.text-muted Mayorista de Electrónica
+                  td
+                    .small
+                      i.fa-solid.fa-phone.me-1.text-muted
+                      | (555) 123-4567
+                    .small
+                      i.fa-solid.fa-envelope.me-1.text-muted
+                      | ventas@acme.com
+                  td.text-center
+                    span.badge.bg-light.text-dark.border 15 productos
+                  td
+                    span.badge.bg-success Activo
+                  td
+                    .d-flex.gap-2
+                      button.btn.btn-sm.btn-warning(title="Editar Proveedor")
+                        i.fa-solid.fa-pencil
+                      button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos")
+                        i.fa-solid.fa-box-open
+                
+                //- Proveedor 2
+                tr
+                  td.text-muted #PRV-002
+                  td
+                    .fw-bold TechSupplies Inc.
+                    .small.text-muted Importador Directo
+                  td
+                    .small
+                      i.fa-solid.fa-phone.me-1.text-muted
+                      | (800) 987-6543
+                    .small
+                      i.fa-solid.fa-envelope.me-1.text-muted
+                      | import@techsupplies.com
+                  td.text-center
+                    span.badge.bg-light.text-dark.border 8 productos
+                  td
+                    span.badge.bg-success Activo
+                  td
+                    .d-flex.gap-2
+                      button.btn.btn-sm.btn-warning(title="Editar Proveedor")
+                        i.fa-solid.fa-pencil
+                      button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos")
+                        i.fa-solid.fa-box-open
+                
+                //- Proveedor 3
+                tr
+                  td.text-muted #PRV-003
+                  td
+                    .fw-bold Logitech Distribuidor
+                    .small.text-muted Periféricos
+                  td
+                    .small
+                      i.fa-solid.fa-phone.me-1.text-muted
+                      | (555) 555-0000
+                    .small
+                      i.fa-solid.fa-envelope.me-1.text-muted
+                      | logi@distribuidor.mx
+                  td.text-center
+                    span.badge.bg-light.text-dark.border 4 productos
+                  td
+                    span.badge.bg-warning.text-dark Inactivo
+                  td
+                    .d-flex.gap-2
+                      button.btn.btn-sm.btn-warning(title="Editar Proveedor")
+                        i.fa-solid.fa-pencil
+                      button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos")
+                        i.fa-solid.fa-box-open

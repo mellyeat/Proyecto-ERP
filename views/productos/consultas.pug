@@ -20,6 +20,7 @@ block content
             tr
               th ID
               th Producto
+              th Proveedor
               th Stock
               th Precio
               th Acciones
@@ -29,6 +30,7 @@ block content
                 tr
                   td.text-muted ##{prod.id}
                   td.fw-bold #{prod.nombre}
+                  td.small.text-muted Empresa ACME S.A.
                   td
                     if prod.stock < 10
                       span.badge.bg-danger #{prod.stock} (Bajo)
@@ -44,4 +46,4 @@ block content
                           i.fa-solid.fa-trash
             else
               tr
-                td(colspan="5").text-center.text-muted.p-4 No hay productos registrados
+                td(colspan="6").text-center.text-muted.p-4 No hay productos registrados

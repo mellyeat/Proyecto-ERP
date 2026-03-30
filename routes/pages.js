@@ -143,6 +143,14 @@ router.get('/productos/altas', verificarSesion, (req, res) => {
     res.render('productos/altas');
 });
 
+router.get('/productos/proveedores', verificarSesion, (req, res) => {
+    res.render('productos/proveedores');
+});
+
+router.get('/productos/proveedor-altas', verificarSesion, (req, res) => {
+    res.render('productos/proveedor-altas');
+});
+
 router.get('/productos/cambios', verificarSesion, (req, res) => {
     res.render('productos/cambios');
 });
@@ -201,28 +209,21 @@ router.get('/ventas/ticket', verificarSesion, (req, res) => {
     res.render('ventas/ticket');
 });
 
-// ================== COMPRAS ==================
-router.get('/compras', verificarSesion, (req, res) => {
+// ================== CLIENTES (CRM) ==================
+router.get('/clientes', verificarSesion, (req, res) => {
+    res.render('clientes');
+});
 
-    db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, ventas) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Error fetching purchases");
-        }
+router.get('/clientes/altas', verificarSesion, (req, res) => {
+    res.render('clientes/altas');
+});
 
-        db.query("SELECT * FROM productos", (err, productos) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).send("Error fetching products");
-            }
+router.get('/clientes/consultas', verificarSesion, (req, res) => {
+    res.render('clientes/consultas');
+});
 
-            res.render('compras', {
-                ventas: ventas,
-                productos: productos
-            });
-
-        });
-    });
+router.get('/clientes/cambios', verificarSesion, (req, res) => {
+    res.render('clientes/cambios');
 });
 
 // AGREGAR VENTA (PRO)
