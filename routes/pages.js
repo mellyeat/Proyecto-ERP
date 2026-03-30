@@ -3,13 +3,21 @@ const router = express.Router();
 const db = require('../config/db');
 const verificarSesion = require('../middleware/auth');
 
-// MOSTRAR LOGIN
+
 router.get('/', (req, res) => {
+    res.redirect('/login');
+});
+
+// MOSTRAR LOGIN
+router.get('/login', (req, res) => {
+    if (req.session.usuario) {
+        return res.redirect('/dashboard');
+    }
     res.render('index');
 });
 
 // VALIDAR LOGIN
-router.post('/', (req, res) => {
+router.post('/login', (req, res) => {
 
     const { usuario, password } = req.body;
 
