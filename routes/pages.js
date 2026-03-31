@@ -22,7 +22,7 @@ router.post('/login', (req, res) => {
     const { usuario, password } = req.body;
 
     db.query(
-        "SELECT * FROM usuarios WHERE usuario = ? AND password = ?",
+        "SELECT * FROM empleados_usuarios WHERE usuario = ? AND password = ? AND activo = true",
         [usuario, password],
         (err, results) => {
 
@@ -50,7 +50,7 @@ router.post('/registro', (req, res) => {
     const { usuario, password } = req.body;
 
     db.query(
-        "SELECT * FROM usuarios WHERE usuario = ?",
+        "SELECT * FROM empleados_usuarios WHERE usuario = ?",
         [usuario],
         (err, results) => {
             if (err) {
@@ -63,7 +63,7 @@ router.post('/registro', (req, res) => {
             }
 
             db.query(
-                "INSERT INTO usuarios (usuario, password) VALUES (?, ?)",
+                "INSERT INTO empleados_usuarios (usuario, password, nombre_completo, puesto) VALUES (?, ?, 'Nuevo Usuario', 'Vendedor')",
                 [usuario, password],
                 (err) => {
                     if (err) {
@@ -80,7 +80,7 @@ router.post('/registro', (req, res) => {
 // Dashboard
 router.get('/dashboard', verificarSesion, (req, res) => {
 
-    db.query("SELECT COUNT(*) AS totalEmpleados FROM empleados", (err, empResult) => {
+    db.query("SELECT COUNT(*) AS totalEmpleados FROM empleados_usuarios", (err, empResult) => {
         if (err) console.log(err);
 
         db.query("SELECT COUNT(*) AS totalProductos FROM productos", (err, prodResult) => {
@@ -108,7 +108,7 @@ router.get('/dashboard', verificarSesion, (req, res) => {
 
 // Empleados
 router.get('/empleados', verificarSesion, (req, res) => {
-    db.query("SELECT * FROM empleados", (err, results) => {
+    db.query("SELECT * FROM empleados_usuarios", (err, results) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Error fetching employees");
@@ -120,7 +120,7 @@ router.get('/empleados', verificarSesion, (req, res) => {
 router.post('/empleados/add', verificarSesion, (req, res) => {
     const { nombre, puesto, salario } = req.body;
     db.query(
-        "INSERT INTO empleados (nombre, puesto, salario) VALUES (?, ?, ?)",
+        "INSERT INTO empleados_usuarios (nombre_completo, puesto, salario) VALUES (?, ?, ?)",
         [nombre, puesto, salario],
         (err) => {
             if (err) {

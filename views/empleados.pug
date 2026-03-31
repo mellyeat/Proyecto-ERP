@@ -50,7 +50,7 @@ block content
                   each emp in empleados
                     tr
                       td.text-muted ##{emp.id}
-                      td.fw-bold #{emp.nombre}
+                      td.fw-bold #{emp.nombre_completo}
                       td 
                         span.badge.bg-light.text-dark.border #{emp.puesto}
                       td.fw-bold(style="color: var(--color-teal);") $#{emp.salario}
