@@ -29,6 +29,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Guardar variables globales en res.locals para Pug
+app.use((req, res, next) => {
+    res.locals.usuario = req.session ? req.session.usuario : null;
+    next();
+});
+
 //rutas
 const pagesRouter = require('./routes/pages');
 app.use('/', pagesRouter);

@@ -11,36 +11,40 @@ block content
   //- Tarjetas de Métricas de Ventas
   .row.g-4.mb-4
     .col-md-3
-      .card-custom.bg-primary.text-white.p-3
+      .card-custom.p-3
         .d-flex.justify-content-between.align-items-center
           div
-            h6.text-white-50.mb-1 Ventas de Hoy
+            h6.text-muted.mb-1 Ventas de Hoy
             h3.fw-bold.mb-0 12
-          i.fa-solid.fa-cart-shopping.fs-1.opacity-50
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(9, 99, 126, 0.1);")
+            i.fa-solid.fa-cart-shopping.fs-3(style="color: var(--color-dark-teal);")
           
     .col-md-3
-      .card-custom.bg-success.text-white.p-3
+      .card-custom.p-3
         .d-flex.justify-content-between.align-items-center
           div
-            h6.text-white-50.mb-1 Ingresos del Mes
+            h6.text-muted.mb-1 Ingresos del Mes
             h3.fw-bold.mb-0 $8,450
-          i.fa-solid.fa-money-bill-trend-up.fs-1.opacity-50
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(25, 135, 84, 0.1);")
+            i.fa-solid.fa-money-bill-trend-up.fs-3.text-success
           
     .col-md-3
-      .card-custom.bg-warning.text-white.p-3
+      .card-custom.p-3
         .d-flex.justify-content-between.align-items-center
           div
-            h6.text-white-50.mb-1 Ticket Promedio
+            h6.text-muted.mb-1 Ticket Promedio
             h3.fw-bold.mb-0 $145
-          i.fa-solid.fa-receipt.fs-1.opacity-50
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(255, 193, 7, 0.1);")
+            i.fa-solid.fa-receipt.fs-3.text-warning
           
     .col-md-3
-      .card-custom.bg-info.text-white.p-3
+      .card-custom.p-3
         .d-flex.justify-content-between.align-items-center
           div
-            h6.text-white-50.mb-1 Clientes Mensuales
+            h6.text-muted.mb-1 Clientes Mensuales
             h3.fw-bold.mb-0 85
-          i.fa-solid.fa-users.fs-1.opacity-50
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(13, 202, 240, 0.1);")
+            i.fa-solid.fa-users.fs-3.text-info
 
   //- Gráficas y Resumen Adicional
   .row.g-4

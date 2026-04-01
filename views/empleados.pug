@@ -21,13 +21,28 @@ block content
             form(action="/empleados/add", method="POST")
               .mb-3
                 label.form-label.text-muted.small Nombre Completo
-                input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Juan Pérez", required)
-              .mb-3
-                label.form-label.text-muted.small Puesto
-                input.form-control.bg-light(type="text", name="puesto", placeholder="Ej: Administrador", required)
+                input.form-control.bg-light(type="text", name="nombre_completo", placeholder="Ej: Juan Pérez", required)
+              .row.mb-3
+                .col-md-6
+                  label.form-label.text-muted.small Usuario
+                  input.form-control.bg-light(type="text", name="usuario", placeholder="Ej: jperez", required)
+                .col-md-6
+                  label.form-label.text-muted.small Contraseña
+                  input.form-control.bg-light(type="password", name="password", placeholder="****", required)
+              .row.mb-3
+                .col-md-6
+                  label.form-label.text-muted.small Puesto
+                  input.form-control.bg-light(type="text", name="puesto", placeholder="Ej: Ventas")
+                .col-md-6
+                  label.form-label.text-muted.small Rol en Sistema
+                  select.form-select.bg-light(name="rol", required)
+                    option(value="SUPER ADMIN") SUPER ADMIN
+                    option(value="RH") RH
+                    option(value="VENTAS", selected) VENTAS
+                    option(value="COMPRAS") COMPRAS
               .mb-3
                 label.form-label.text-muted.small Salario Mensual ($)
-                input.form-control.bg-light(type="number", step="0.01", name="salario", placeholder="Ej: 1500.00", required)
+                input.form-control.bg-light(type="number", step="0.01", name="salario", placeholder="Ej: 1500.00")
               button.btn.btn-primary-custom.w-100(type="submit") Añadir Empleado
 
     .col-md-8
@@ -42,9 +57,11 @@ block content
               thead
                 tr
                   th ID
-                  th Nombre
-                  th Puesto
+                  th Nombre Completo
+                  th Credencial
+                  th Puesto / Rol
                   th Salario
+                  th Estado
               tbody
                 if empleados && empleados.length > 0
                   each emp in empleados
@@ -52,8 +69,16 @@ block content
                       td.text-muted ##{emp.id}
                       td.fw-bold #{emp.nombre_completo}
                       td 
-                        span.badge.bg-light.text-dark.border #{emp.puesto}
+                        span.text-muted.small @#{emp.usuario}
+                      td 
+                        div.small #{emp.puesto}
+                        span.badge.bg-secondary.rounded-pill(style="font-size: 0.70em;") #{emp.rol}
                       td.fw-bold(style="color: var(--color-teal);") $#{emp.salario}
+                      td
+                        if emp.activo
+                          span.badge.bg-success Activo
+                        else
+                          span.badge.bg-danger Inactivo
                 else
                   tr
-                    td(colspan="4").text-center.text-muted.p-4 No hay empleados registrados
+                    td(colspan="6").text-center.text-muted.p-4 No hay empleados registrados

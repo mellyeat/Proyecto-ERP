@@ -31,105 +31,109 @@ html(lang="es")
                 i.fa-solid.fa-gauge-high.me-2
                 | Dashboard
 
-            li.nav-item
-              a.nav-link.sidebar-link(
-                href="/empleados", 
-                class=(activePage === 'empleados' ? 'active' : '')
-              )
-                i.fa-solid.fa-users.me-2
-                | Empleados
+            if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'RH')
+              li.nav-item
+                a.nav-link.sidebar-link(
+                  href="/empleados", 
+                  class=(activePage === 'empleados' ? 'active' : '')
+                )
+                  i.fa-solid.fa-users.me-2
+                  | Empleados
 
-            li.nav-item
-              a.nav-link.sidebar-link(
-                data-bs-toggle="collapse",
-                href="#productosMenu",
-                role="button",
-                aria-expanded=(activePage === 'productos' ? 'true' : 'false'),
-                aria-controls="productosMenu",
-                class=(activePage === 'productos' ? 'active' : '')
-              )
-                i.fa-solid.fa-box-open.me-2
-                | Productos
-                i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
-              
-              .collapse(id="productosMenu", class=(activePage === 'productos' ? 'show' : ''))
-                ul.nav.flex-column.ms-3.mt-2
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/productos") 
-                      i.fa-solid.fa-chart-simple.me-2
-                      | Resumen
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/productos/altas") 
-                      i.fa-solid.fa-plus-circle.me-2
-                      | Nuevo Producto
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/productos/consultas")
-                      i.fa-solid.fa-list.me-2
-                      | Inventario
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/productos/proveedores")
-                      i.fa-solid.fa-truck-fast.me-2
-                      | Proveedores
+            if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'COMPRAS')
+              li.nav-item
+                a.nav-link.sidebar-link(
+                  data-bs-toggle="collapse",
+                  href="#productosMenu",
+                  role="button",
+                  aria-expanded=(activePage === 'productos' ? 'true' : 'false'),
+                  aria-controls="productosMenu",
+                  class=(activePage === 'productos' ? 'active' : '')
+                )
+                  i.fa-solid.fa-box-open.me-2
+                  | Productos
+                  i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
+                
+                .collapse(id="productosMenu", class=(activePage === 'productos' ? 'show' : ''))
+                  ul.nav.flex-column.ms-3.mt-2
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/productos") 
+                        i.fa-solid.fa-chart-simple.me-2
+                        | Resumen
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/productos/altas") 
+                        i.fa-solid.fa-plus-circle.me-2
+                        | Nuevo Producto
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/productos/consultas")
+                        i.fa-solid.fa-list.me-2
+                        | Inventario
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/productos/proveedores")
+                        i.fa-solid.fa-truck-fast.me-2
+                        | Proveedores
 
-            li.nav-item
-              a.nav-link.sidebar-link(
-                data-bs-toggle="collapse",
-                href="#ventasMenu",
-                role="button",
-                aria-expanded=(activePage === 'ventas' ? 'true' : 'false'),
-                aria-controls="ventasMenu",
-                class=(activePage === 'ventas' ? 'active' : '')
-              )
-                i.fa-solid.fa-money-bill-wave.me-2
-                | Ventas
-                i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
-              
-              .collapse(id="ventasMenu", class=(activePage === 'ventas' ? 'show' : ''))
-                ul.nav.flex-column.ms-3.mt-2
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/ventas") 
-                      i.fa-solid.fa-chart-simple.me-2
-                      | Resumen
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/ventas/altas") 
-                      i.fa-solid.fa-plus-circle.me-2
-                      | Nueva Venta
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/ventas/consultas")
-                      i.fa-solid.fa-list.me-2
-                      | Historial
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/ventas/facturas")
-                      i.fa-solid.fa-file-invoice.me-2
-                      | Facturas
+            if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'VENTAS')
+              li.nav-item
+                a.nav-link.sidebar-link(
+                  data-bs-toggle="collapse",
+                  href="#ventasMenu",
+                  role="button",
+                  aria-expanded=(activePage === 'ventas' ? 'true' : 'false'),
+                  aria-controls="ventasMenu",
+                  class=(activePage === 'ventas' ? 'active' : '')
+                )
+                  i.fa-solid.fa-money-bill-wave.me-2
+                  | Ventas
+                  i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
+                
+                .collapse(id="ventasMenu", class=(activePage === 'ventas' ? 'show' : ''))
+                  ul.nav.flex-column.ms-3.mt-2
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/ventas") 
+                        i.fa-solid.fa-chart-simple.me-2
+                        | Resumen
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/ventas/altas") 
+                        i.fa-solid.fa-plus-circle.me-2
+                        | Nueva Venta
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/ventas/consultas")
+                        i.fa-solid.fa-list.me-2
+                        | Historial
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/ventas/facturas")
+                        i.fa-solid.fa-file-invoice.me-2
+                        | Facturas
 
-            li.nav-item
-              a.nav-link.sidebar-link(
-                data-bs-toggle="collapse",
-                href="#clientesMenu",
-                role="button",
-                aria-expanded=(activePage === 'clientes' ? 'true' : 'false'),
-                aria-controls="clientesMenu",
-                class=(activePage === 'clientes' ? 'active' : '')
-              )
-                i.fa-solid.fa-users.me-2
-                | Clientes
-                i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
-              
-              .collapse(id="clientesMenu", class=(activePage === 'clientes' ? 'show' : ''))
-                ul.nav.flex-column.ms-3.mt-2
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/clientes") 
-                      i.fa-solid.fa-chart-simple.me-2
-                      | Resumen
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/clientes/altas") 
-                      i.fa-solid.fa-user-plus.me-2
-                      | Nuevo Cliente
-                  li.nav-item
-                    a.nav-link.sidebar-link.small.py-1(href="/clientes/consultas")
-                      i.fa-solid.fa-address-book.me-2
-                      | Directorio
+            if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'VENTAS')
+              li.nav-item
+                a.nav-link.sidebar-link(
+                  data-bs-toggle="collapse",
+                  href="#clientesMenu",
+                  role="button",
+                  aria-expanded=(activePage === 'clientes' ? 'true' : 'false'),
+                  aria-controls="clientesMenu",
+                  class=(activePage === 'clientes' ? 'active' : '')
+                )
+                  i.fa-solid.fa-users.me-2
+                  | Clientes
+                  i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
+                
+                .collapse(id="clientesMenu", class=(activePage === 'clientes' ? 'show' : ''))
+                  ul.nav.flex-column.ms-3.mt-2
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/clientes") 
+                        i.fa-solid.fa-chart-simple.me-2
+                        | Resumen
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/clientes/altas") 
+                        i.fa-solid.fa-user-plus.me-2
+                        | Nuevo Cliente
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/clientes/consultas")
+                        i.fa-solid.fa-address-book.me-2
+                        | Directorio
 
           .mt-auto.p-3
             .text-center.text-white-50.small

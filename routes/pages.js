@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const verificarSesion = require('../middleware/auth');
+const verificarRol = require('../middleware/roles');
 
 
 router.get('/', (req, res) => {
@@ -35,7 +36,7 @@ router.post('/login', (req, res) => {
                     res.redirect('/dashboard');
                     } else {
                     res.render('index', {
-                    error: "Usuario o contraseña incorrectos ❌"
+                    error: "Usuario o contraseña incorrectos"
                 });
             }
         }
@@ -106,8 +107,7 @@ router.get('/dashboard', verificarSesion, (req, res) => {
 
 });
 
-// Empleados
-router.get('/empleados', verificarSesion, (req, res) => {
+router.get('/empleados', verificarSesion, verificarRol(['RH']), (req, res) => {
     db.query("SELECT * FROM empleados_usuarios", (err, results) => {
         if (err) {
             console.log(err);
@@ -117,11 +117,11 @@ router.get('/empleados', verificarSesion, (req, res) => {
     });
 });
 
-router.post('/empleados/add', verificarSesion, (req, res) => {
-    const { nombre, puesto, salario } = req.body;
+router.post('/empleados/add', verificarSesion, verificarRol(['RH']), (req, res) => {
+    const { nombre_completo, usuario, password, puesto, rol, salario } = req.body;
     db.query(
-        "INSERT INTO empleados_usuarios (nombre_completo, puesto, salario) VALUES (?, ?, ?)",
-        [nombre, puesto, salario],
+        "INSERT INTO empleados_usuarios (nombre_completo, usuario, password, puesto, rol, salario) VALUES (?, ?, ?, ?, ?, ?)",
+        [nombre_completo, usuario, password, puesto, rol, salario || 0],
         (err) => {
             if (err) {
                 console.log(err);
@@ -132,12 +132,11 @@ router.post('/empleados/add', verificarSesion, (req, res) => {
     );
 });
 
-// Productos
-router.get('/productos', verificarSesion, (req, res) => {
+router.get('/productos', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
     res.render('productos');
 });
 
-router.get('/productos/consultas', verificarSesion, (req, res) => {
+router.get('/productos/consultas', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
     db.query("SELECT * FROM productos", (err, results) => {
         if (err) {
             console.log(err);
@@ -147,25 +146,25 @@ router.get('/productos/consultas', verificarSesion, (req, res) => {
     });
 });
 
-router.get('/productos/altas', verificarSesion, (req, res) => {
+router.get('/productos/altas', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
     res.render('productos/altas');
 });
 
-router.get('/productos/proveedores', verificarSesion, (req, res) => {
+router.get('/productos/proveedores', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
     res.render('productos/proveedores');
 });
 
-router.get('/productos/proveedor-altas', verificarSesion, (req, res) => {
+router.get('/productos/proveedor-altas', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
     res.render('productos/proveedor-altas');
 });
 
-router.get('/productos/cambios', verificarSesion, (req, res) => {
+router.get('/productos/cambios', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
     res.render('productos/cambios');
 });
 
 
 
-router.post('/productos/add', verificarSesion,(req, res) => {
+router.post('/productos/add', verificarSesion, verificarRol(['COMPRAS']),(req, res) => {
     const { nombre, stock, precio } = req.body;
     db.query(
         "INSERT INTO productos (nombre, stock, precio) VALUES (?, ?, ?)",
@@ -180,12 +179,11 @@ router.post('/productos/add', verificarSesion,(req, res) => {
     );
 });
 
-// VENTAS (CORREGIDO)
-router.get('/ventas', verificarSesion, (req, res) => {
+router.get('/ventas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('ventas');
 });
 
-router.get('/ventas/altas', verificarSesion, (req, res) => {
+router.get('/ventas/altas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     db.query("SELECT * FROM productos", (err, productos) => {
         if (err) {
             console.log(err);
@@ -195,7 +193,7 @@ router.get('/ventas/altas', verificarSesion, (req, res) => {
     });
 });
 
-router.get('/ventas/consultas', verificarSesion, (req, res) => {
+router.get('/ventas/consultas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     db.query("SELECT * FROM ventas ORDER BY fecha DESC", (err, ventas) => {
         if (err) {
             console.log(err);
@@ -205,37 +203,37 @@ router.get('/ventas/consultas', verificarSesion, (req, res) => {
     });
 });
 
-router.get('/ventas/facturas', verificarSesion, (req, res) => {
+router.get('/ventas/facturas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('ventas/facturas');
 });
 
-router.get('/ventas/factura-view', verificarSesion, (req, res) => {
+router.get('/ventas/factura-view', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('ventas/factura-view');
 });
 
-router.get('/ventas/ticket', verificarSesion, (req, res) => {
+router.get('/ventas/ticket', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('ventas/ticket');
 });
 
 // ================== CLIENTES (CRM) ==================
-router.get('/clientes', verificarSesion, (req, res) => {
+router.get('/clientes', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('clientes');
 });
 
-router.get('/clientes/altas', verificarSesion, (req, res) => {
+router.get('/clientes/altas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('clientes/altas');
 });
 
-router.get('/clientes/consultas', verificarSesion, (req, res) => {
+router.get('/clientes/consultas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('clientes/consultas');
 });
 
-router.get('/clientes/cambios', verificarSesion, (req, res) => {
+router.get('/clientes/cambios', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     res.render('clientes/cambios');
 });
 
 // AGREGAR VENTA (PRO)
-router.post('/ventas/add', verificarSesion, (req, res) => {
+router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     const { cliente, producto, monto, cantidad } = req.body;
 
     db.query("SELECT * FROM productos WHERE nombre = ?", [producto], (err, result) => {
