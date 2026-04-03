@@ -25,9 +25,9 @@ block content
                 label.form-label.text-muted.small Proveedor
                 select.form-select.bg-light(name="proveedor", required)
                   option(value="" disabled selected) Seleccionar un proveedor...
-                  option(value="Empresa ACME S.A.") Empresa ACME S.A.
-                  option(value="TechSupplies Inc.") TechSupplies Inc.
-                  option(value="Logitech Distribuidor") Logitech Distribuidor
+                  if proveedores && proveedores.length > 0
+                    each prov in proveedores
+                      option(value=prov.id)= prov.razon_social
               .mb-3
                 label.form-label.text-muted.small Stock Disponible
                 input.form-control.bg-light(type="number", name="stock", placeholder="Ej: 50", required)

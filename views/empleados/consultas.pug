@@ -1,0 +1,57 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'empleados'
+  - var title = 'Directorio de Empleados - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Directorio de Personal
+    a.btn.btn-primary-custom(href="/empleados/altas")
+      i.fa-solid.fa-user-plus.me-2
+      | Nuevo Empleado
+
+  .card-custom
+    .card-body.p-0
+      .p-3.border-bottom.d-flex.justify-content-between.align-items-center
+        h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+          i.fa-solid.fa-id-card.me-2
+          | Empleados Registrados
+      .table-responsive
+        table.table.table-custom.mb-0.align-middle
+          thead
+            tr
+              th ID
+              th Empleado
+              th Usuario
+              th Puesto
+              th Rol
+              th Salario
+              th Estado
+              th Acciones
+          tbody
+            if empleados && empleados.length > 0
+              each emp in empleados
+                tr
+                  td.text-muted ##{emp.id}
+                  td
+                    .fw-bold= emp.nombre_completo
+                    .small.text-muted= new Date(emp.fecha_contratacion).toLocaleDateString()
+                  td
+                    code= emp.usuario
+                  td= emp.puesto || 'Sin asignar'
+                  td
+                    - var badgeColor = emp.rol === 'admin' ? 'bg-dark' : emp.rol === 'RH' ? 'bg-primary' : emp.rol === 'VENTAS' ? 'bg-success' : 'bg-warning text-dark'
+                    span(class=`badge ${badgeColor}`)= emp.rol
+                  td.fw-bold(style="color: var(--color-teal)") $#{parseFloat(emp.salario || 0).toFixed(2)}
+                  td
+                    if emp.activo
+                      span.badge.bg-success Activo
+                    else
+                      span.badge.bg-danger Inactivo
+                  td
+                    a.btn.btn-sm.btn-warning(href=`/empleados/cambios?id=${emp.id}`, title="Editar")
+                      i.fa-solid.fa-pencil
+            else
+              tr
+                td(colspan="8").text-center.text-muted.p-4 No hay empleados registrados

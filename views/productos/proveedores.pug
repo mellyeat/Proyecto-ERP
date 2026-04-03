@@ -35,74 +35,30 @@ block content
                   th Estado
                   th Acciones
               tbody
-                //- Proveedor 1
-                tr
-                  td.text-muted #PRV-001
-                  td
-                    .fw-bold Empresa ACME S.A.
-                    .small.text-muted Mayorista de Electrónica
-                  td
-                    .small
-                      i.fa-solid.fa-phone.me-1.text-muted
-                      | (555) 123-4567
-                    .small
-                      i.fa-solid.fa-envelope.me-1.text-muted
-                      | ventas@acme.com
-                  td.text-center
-                    span.badge.bg-light.text-dark.border 15 productos
-                  td
-                    span.badge.bg-success Activo
-                  td
-                    .d-flex.gap-2
-                      button.btn.btn-sm.btn-warning(title="Editar Proveedor")
-                        i.fa-solid.fa-pencil
-                      button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos")
-                        i.fa-solid.fa-box-open
-                
-                //- Proveedor 2
-                tr
-                  td.text-muted #PRV-002
-                  td
-                    .fw-bold TechSupplies Inc.
-                    .small.text-muted Importador Directo
-                  td
-                    .small
-                      i.fa-solid.fa-phone.me-1.text-muted
-                      | (800) 987-6543
-                    .small
-                      i.fa-solid.fa-envelope.me-1.text-muted
-                      | import@techsupplies.com
-                  td.text-center
-                    span.badge.bg-light.text-dark.border 8 productos
-                  td
-                    span.badge.bg-success Activo
-                  td
-                    .d-flex.gap-2
-                      button.btn.btn-sm.btn-warning(title="Editar Proveedor")
-                        i.fa-solid.fa-pencil
-                      button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos")
-                        i.fa-solid.fa-box-open
-                
-                //- Proveedor 3
-                tr
-                  td.text-muted #PRV-003
-                  td
-                    .fw-bold Logitech Distribuidor
-                    .small.text-muted Periféricos
-                  td
-                    .small
-                      i.fa-solid.fa-phone.me-1.text-muted
-                      | (555) 555-0000
-                    .small
-                      i.fa-solid.fa-envelope.me-1.text-muted
-                      | logi@distribuidor.mx
-                  td.text-center
-                    span.badge.bg-light.text-dark.border 4 productos
-                  td
-                    span.badge.bg-warning.text-dark Inactivo
-                  td
-                    .d-flex.gap-2
-                      button.btn.btn-sm.btn-warning(title="Editar Proveedor")
-                        i.fa-solid.fa-pencil
-                      button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos")
-                        i.fa-solid.fa-box-open
+                if proveedores && proveedores.length > 0
+                  each prov in proveedores
+                    tr
+                      td.text-muted #PRV-#{prov.id}
+                      td
+                        .fw-bold= prov.razon_social
+                        .small.text-muted= prov.categoria
+                      td
+                        .small
+                          i.fa-solid.fa-phone.me-1.text-muted
+                          | #{prov.telefono}
+                        .small
+                          i.fa-solid.fa-envelope.me-1.text-muted
+                          | #{prov.email}
+                      td.text-center
+                        span.badge.bg-light.text-dark.border 0 productos
+                      td
+                        span.badge.bg-success Activo
+                      td
+                        .d-flex.gap-2
+                          button.btn.btn-sm.btn-warning(title="Editar Proveedor", disabled)
+                            i.fa-solid.fa-pencil
+                          button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos", disabled)
+                            i.fa-solid.fa-box-open
+                else
+                  tr
+                    td(colspan="6").text-center.text-muted No hay proveedores registrados

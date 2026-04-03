@@ -21,16 +21,20 @@ block content
             form(action="/ventas/add", method="POST")
               .mb-3
                 label.form-label.text-muted.small Nombre del Cliente
-                input.form-control.bg-light(type="text", name="cliente", placeholder="Ej: Empresa ACME", required)
+                select.form-select.bg-light(name="cliente_id", required)
+                  option(value="" disabled selected) Seleccionar cliente...
+                  if clientes && clientes.length > 0
+                    each cliente in clientes
+                      option(value=cliente.id)= cliente.nombre_comercial
 
               .mb-3
                 label.form-label.text-muted.small Seleccionar Producto
-                select.form-select.bg-light(name="producto", id="producto", required)
+                select.form-select.bg-light(name="producto_id", id="producto", required)
                   option(value="" disabled selected) Elige un producto
                   if productos && productos.length > 0
                     each prod in productos
                       option(
-                        value=prod.nombre
+                        value=prod.id
                         data-precio=prod.precio
                       ) #{prod.nombre} - $#{prod.precio}
                   else

@@ -32,50 +32,30 @@ block content
               th Saldo Pendiente
               th Acciones
           tbody
-            //- Datos Simulados
-            tr
-              td
-                .fw-bold Empresa ACME S.A.
-                .small.text-muted Cliente Activo
-              td
-                .fw-bold.text-uppercase(style="color: var(--color-dark-teal);") XAXX010101000
-                .small.text-muted Av. Principal 456
-              td
-                .small
-                  i.fa-solid.fa-envelope.me-1.text-muted
-                  | contacto@empresa.com
-                .small
-                  i.fa-solid.fa-phone.me-1.text-muted
-                  | (123) 456-7890
-              td.fw-bold(style="color: var(--color-teal);") $0.00
-              td
-                .d-flex.gap-2
-                  a.btn.btn-sm.btn-warning(href="/clientes/cambios?id=1", title="Editar Perfil")
-                    i.fa-solid.fa-pencil
-                  //- Este es el botón "apartado para crear factura" del que se habló
-                  a.btn.btn-sm.btn-success(href="/ventas/factura-view", title="Emitir Nueva Factura Libre")
-                    i.fa-solid.fa-file-invoice-dollar.me-1
-                    | Facturar
-                    
-            tr
-              td
-                .fw-bold Servicios Digitales LLC
-                .small.text-muted Cliente Activo
-              td
-                .fw-bold.text-uppercase(style="color: var(--color-dark-teal);") YBYY020202111
-                .small.text-muted Blvd Tecnológico 85
-              td
-                .small
-                  i.fa-solid.fa-envelope.me-1.text-muted
-                  | admin@serviciosdig.mx
-                .small
-                  i.fa-solid.fa-phone.me-1.text-muted
-                  | (555) 987-6543
-              td.fw-bold.text-danger $1,250.00
-              td
-                .d-flex.gap-2
-                  a.btn.btn-sm.btn-warning(href="/clientes/cambios?id=2", title="Editar Perfil")
-                    i.fa-solid.fa-pencil
-                  a.btn.btn-sm.btn-success(href="/ventas/factura-view", title="Emitir Nueva Factura Libre")
-                    i.fa-solid.fa-file-invoice-dollar.me-1
-                    | Facturar
+            if clientes && clientes.length > 0
+              each cliente in clientes
+                tr
+                  td
+                    .fw-bold= cliente.nombre_comercial
+                    .small.text-muted Cliente Activo
+                  td
+                    .fw-bold.text-uppercase(style="color: var(--color-dark-teal);")= cliente.rfc ? cliente.rfc : 'N/A'
+                    .small.text-muted= cliente.direccion_fiscal ? cliente.direccion_fiscal : 'Sin dirección'
+                  td
+                    .small
+                      i.fa-solid.fa-envelope.me-1.text-muted
+                      | #{cliente.email}
+                    .small
+                      i.fa-solid.fa-phone.me-1.text-muted
+                      | #{cliente.telefono}
+                  td.fw-bold(style="color: var(--color-teal);") $0.00
+                  td
+                    .d-flex.gap-2
+                      a.btn.btn-sm.btn-warning(href="/clientes/cambios?id=" + cliente.id, title="Editar Perfil")
+                        i.fa-solid.fa-pencil
+                      a.btn.btn-sm.btn-success(href="/ventas/factura-view", title="Emitir Nueva Factura Libre")
+                        i.fa-solid.fa-file-invoice-dollar.me-1
+                        | Facturar
+            else
+              tr
+                td(colspan="5").text-center.text-muted No hay clientes registrados

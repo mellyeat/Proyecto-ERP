@@ -18,16 +18,23 @@ block content
               | Editar Producto
           .p-4
             form(action="/productos/edit", method="POST")
-              input(type="hidden", name="id")
+              input(type="hidden", name="id", value=producto.id)
               .mb-3
                 label.form-label.text-muted.small Nombre del Producto
-                input.form-control.bg-light(type="text", name="nombre", placeholder="Ej: Teclado Mecánico", required)
+                input.form-control.bg-light(type="text", name="nombre", value=producto.nombre, required)
+              .mb-3
+                label.form-label.text-muted.small Proveedor
+                select.form-select.bg-light(name="proveedor", required)
+                  option(value="" disabled) Seleccionar un proveedor...
+                  if proveedores && proveedores.length > 0
+                    each prov in proveedores
+                      option(value=prov.id, selected=(producto.proveedor_id == prov.id))= prov.razon_social
               .mb-3
                 label.form-label.text-muted.small Stock Disponible
-                input.form-control.bg-light(type="number", name="stock", placeholder="Ej: 50", required)
+                input.form-control.bg-light(type="number", name="stock", value=producto.stock, required)
               .mb-3
                 label.form-label.text-muted.small Precio Unitario ($)
-                input.form-control.bg-light(type="number", step="0.01", name="precio", placeholder="Ej: 25.50", required)
+                input.form-control.bg-light(type="number", step="0.01", name="precio", value=producto.precio, required)
               
               .d-flex.gap-3.mt-4
                 a.btn.btn-secondary.w-50(href="/productos/consultas") Cancelar

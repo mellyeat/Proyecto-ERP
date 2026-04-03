@@ -15,7 +15,7 @@ block content
         .d-flex.justify-content-between.align-items-center
           div
             h6.text-muted.mb-1 Ventas de Hoy
-            h3.fw-bold.mb-0 12
+            h3.fw-bold.mb-0 #{metrics.ventas_hoy || 0}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(9, 99, 126, 0.1);")
             i.fa-solid.fa-cart-shopping.fs-3(style="color: var(--color-dark-teal);")
           
@@ -24,7 +24,7 @@ block content
         .d-flex.justify-content-between.align-items-center
           div
             h6.text-muted.mb-1 Ingresos del Mes
-            h3.fw-bold.mb-0 $8,450
+            h3.fw-bold.mb-0 $#{metrics.ingresos_mes ? parseFloat(metrics.ingresos_mes).toLocaleString('es-MX') : '0'}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(25, 135, 84, 0.1);")
             i.fa-solid.fa-money-bill-trend-up.fs-3.text-success
           
@@ -33,7 +33,7 @@ block content
         .d-flex.justify-content-between.align-items-center
           div
             h6.text-muted.mb-1 Ticket Promedio
-            h3.fw-bold.mb-0 $145
+            h3.fw-bold.mb-0 $#{metrics.ticket_promedio ? parseFloat(metrics.ticket_promedio).toFixed(0) : '0'}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(255, 193, 7, 0.1);")
             i.fa-solid.fa-receipt.fs-3.text-warning
           
@@ -42,7 +42,7 @@ block content
         .d-flex.justify-content-between.align-items-center
           div
             h6.text-muted.mb-1 Clientes Mensuales
-            h3.fw-bold.mb-0 85
+            h3.fw-bold.mb-0 #{metrics.clientes_mes || 0}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(13, 202, 240, 0.1);")
             i.fa-solid.fa-users.fs-3.text-info
 
@@ -54,9 +54,10 @@ block content
           .p-3.border-bottom.d-flex.justify-content-between.align-items-center
             h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
               i.fa-solid.fa-chart-line.me-2
-              | Evolución de Ventas Semanales
+              | Evolución de Ventas (Últimos 7 días)
           .p-4.flex-grow-1.d-flex.justify-content-center.align-items-center
-            canvas#salesChart(style="max-height: 250px; width: 100%;")
+            .chart-wrapper.w-100
+              canvas#salesChart(style="max-height: 250px; width: 100%;")
 
     .col-md-4
       .card-custom.h-100
@@ -67,36 +68,39 @@ block content
               | Top Productos Vendidos
           .p-3
             ul.list-group.list-group-flush
-              li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
-                span.text-muted 1. Monitor 24" 144Hz
-                span.badge.bg-success.rounded-pill 45 unds
-              li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
-                span.text-muted 2. Teclado Mecánico RGB
-                span.badge.bg-primary.rounded-pill 30 unds
-              li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
-                span.text-muted 3. Mouse Inalámbrico
-                span.badge.bg-warning.text-dark.rounded-pill 25 unds
-              li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
-                span.text-muted 4. Audífonos Gamer
-                span.badge.bg-secondary.rounded-pill 12 unds
+              if topProducts && topProducts.length > 0
+                each prod, i in topProducts
+                  li.list-group-item.d-flex.justify-content-between.align-items-center.bg-transparent.px-0
+                    span.text-muted #{i + 1}. #{prod.nombre}
+                    - var colors = ['bg-success', 'bg-primary', 'bg-warning text-dark', 'bg-secondary', 'bg-info']
+                    span(class=`badge ${colors[i] || 'bg-secondary'} rounded-pill`) #{prod.total_vendido} unds
+              else
+                li.list-group-item.bg-transparent.px-0.text-center.text-muted Sin datos de ventas
+
+  //- Hidden data for chart
+  script.
+    window.__chartLabels = !{chartLabels};
+    window.__chartValues = !{chartValues};
 
 block scripts
   script(src="https://cdn.jsdelivr.net/npm/chart.js")
   script.
     document.addEventListener("DOMContentLoaded", function() {
+      const labels = window.__chartLabels || [];
+      const values = window.__chartValues || [];
       const ctx = document.getElementById('salesChart').getContext('2d');
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+          labels: labels,
           datasets: [{
             label: 'Ingresos Diarios ($)',
-            data: [450, 800, 600, 1200, 1500, 2000, 1900],
-            borderColor: '#20c997', // var(--color-teal)
+            data: values,
+            borderColor: '#20c997',
             backgroundColor: 'rgba(32, 201, 151, 0.2)',
             borderWidth: 2,
             pointBackgroundColor: '#fff',
-            pointBorderColor: '#05445e', // var(--color-dark-teal)
+            pointBorderColor: '#05445e',
             pointBorderWidth: 2,
             pointRadius: 4,
             fill: true,
@@ -106,22 +110,21 @@ block scripts
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: {
+            duration: 1200,
+            easing: 'easeOutQuart',
+            delay: (ctx) => ctx.dataIndex * 90
+          },
           plugins: {
-            legend: {
-              display: false
-            }
+            legend: { display: false }
           },
           scales: {
             y: {
               beginAtZero: true,
-              grid: {
-                color: 'rgba(0,0,0,0.05)'
-              }
+              grid: { color: 'rgba(0,0,0,0.05)' }
             },
             x: {
-              grid: {
-                display: false
-              }
+              grid: { display: false }
             }
           }
         }

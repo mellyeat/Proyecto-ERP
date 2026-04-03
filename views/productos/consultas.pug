@@ -30,7 +30,7 @@ block content
                 tr
                   td.text-muted ##{prod.id}
                   td.fw-bold #{prod.nombre}
-                  td.small.text-muted Empresa ACME S.A.
+                  td.small.text-muted= prod.proveedor_nombre || 'Sin Proveedor'
                   td
                     if prod.stock < 10
                       span.badge.bg-danger #{prod.stock} (Bajo)

@@ -1,0 +1,87 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'empleados'
+  - var title = 'Recursos Humanos - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Panel de Recursos Humanos
+
+  //- Tarjetas de Métricas
+  .row.g-4.mb-4
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Total Empleados
+            h3.fw-bold.mb-0 #{metrics ? metrics.total : 0}
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(9, 99, 126, 0.1);")
+            i.fa-solid.fa-users.fs-3(style="color: var(--color-dark-teal);")
+
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Activos
+            h3.fw-bold.mb-0 #{metrics ? metrics.activos : 0}
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(25, 135, 84, 0.1);")
+            i.fa-solid.fa-user-check.fs-3.text-success
+
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Inactivos
+            h3.fw-bold.mb-0 #{metrics ? metrics.inactivos : 0}
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(220, 53, 69, 0.1);")
+            i.fa-solid.fa-user-slash.fs-3.text-danger
+
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Salario Promedio
+            h3.fw-bold.mb-0 $#{metrics && metrics.salario_promedio ? parseFloat(metrics.salario_promedio).toFixed(0) : '0'}
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(255, 193, 7, 0.1);")
+            i.fa-solid.fa-money-bill-wave.fs-3.text-warning
+
+  //- Accesos rápidos
+  .row.g-4
+    .col-md-6
+      .card-custom.h-100
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+              i.fa-solid.fa-bolt.me-2
+              | Acciones Rápidas
+          .p-4
+            .d-grid.gap-3
+              a.btn.btn-primary-custom(href="/empleados/altas")
+                i.fa-solid.fa-user-plus.me-2
+                | Registrar Nuevo Empleado
+              a.btn.btn-outline-secondary(href="/empleados/consultas")
+                i.fa-solid.fa-list.me-2
+                | Ver Directorio Completo
+
+    .col-md-6
+      .card-custom.h-100
+        .card-body.p-0
+          .p-3.border-bottom
+            h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+              i.fa-solid.fa-shield-halved.me-2
+              | Roles del Sistema
+          .p-4
+            ul.list-group.list-group-flush
+              li.list-group-item.bg-transparent.px-0.d-flex.justify-content-between
+                span.fw-bold admin
+                span.badge.bg-dark Acceso Total
+              li.list-group-item.bg-transparent.px-0.d-flex.justify-content-between
+                span.fw-bold RH
+                span.badge.bg-primary Recursos Humanos
+              li.list-group-item.bg-transparent.px-0.d-flex.justify-content-between
+                span.fw-bold VENTAS
+                span.badge.bg-success Módulo Ventas
+              li.list-group-item.bg-transparent.px-0.d-flex.justify-content-between
+                span.fw-bold COMPRAS
+                span.badge.bg-warning.text-dark Módulo Compras

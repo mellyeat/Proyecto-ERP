@@ -43,14 +43,16 @@ block content
       .card-custom.h-100
         .card-body
           h6.fw-bold.mb-3(style="color: var(--color-dark-teal);") Ventas por Día (Últimos 7 días)
-          canvas#ventasChart(height="220" style="max-height: 250px;")
+          .chart-wrapper.delay-1
+            canvas#ventasChart(height="220" style="max-height: 250px;")
     
     .col-md-6
       .card-custom.h-100
         .card-body
           h6.fw-bold.mb-3(style="color: var(--color-dark-teal);") Top 5 Productos Vendidos
           .d-flex.justify-content-center
-            canvas#productosChart(height="220" style="max-height: 250px;")
+            .chart-wrapper.delay-2.w-100
+              canvas#productosChart(height="220" style="max-height: 250px;")
 
   // tabla principal
   .card-custom.mt-4.mb-4
@@ -110,6 +112,11 @@ block scripts
             options: { 
               responsive: true,
               maintainAspectRatio: false,
+              animation: {
+                duration: 1200,
+                easing: 'easeOutQuart',
+                delay: (ctx) => ctx.dataIndex * 80
+              },
               plugins: { legend: { display: false } },
               scales: { 
                 y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
@@ -134,6 +141,12 @@ block scripts
             options: { 
               responsive: true,
               maintainAspectRatio: false,
+              animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1000,
+                easing: 'easeOutBack'
+              },
               plugins: { legend: { position: 'right' } }
             }
           });

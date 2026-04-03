@@ -14,7 +14,7 @@ block content
         .d-flex.justify-content-between.align-items-center
           div
             h6.text-muted.mb-1 Total Registros
-            h3.fw-bold.mb-0 145
+            h3.fw-bold.mb-0 #{metrics ? metrics.total : 0}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(9, 99, 126, 0.1);")
             i.fa-solid.fa-box-open.fs-3(style="color: var(--color-dark-teal);")
           
@@ -22,8 +22,8 @@ block content
       .card-custom.p-3
         .d-flex.justify-content-between.align-items-center
           div
-            h6.text-muted.mb-1 En Stock
-            h3.fw-bold.mb-0 1,230
+            h6.text-muted.mb-1 Unidades en Stock
+            h3.fw-bold.mb-0 #{metrics ? metrics.stock_total : 0}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(25, 135, 84, 0.1);")
             i.fa-solid.fa-boxes-stacked.fs-3.text-success
           
@@ -32,7 +32,7 @@ block content
         .d-flex.justify-content-between.align-items-center
           div
             h6.text-muted.mb-1 Próximos a Agotarse
-            h3.fw-bold.mb-0 12
+            h3.fw-bold.mb-0 #{metrics ? metrics.bajo_stock : 0}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(255, 193, 7, 0.1);")
             i.fa-solid.fa-triangle-exclamation.fs-3.text-warning
           
@@ -41,11 +41,11 @@ block content
         .d-flex.justify-content-between.align-items-center
           div
             h6.text-muted.mb-1 Sin Stock
-            h3.fw-bold.mb-0 3
+            h3.fw-bold.mb-0 #{metrics ? metrics.sin_stock : 0}
           .icon-box.p-3.rounded-circle(style="background-color: rgba(220, 53, 69, 0.1);")
             i.fa-solid.fa-circle-xmark.fs-3.text-danger
 
-  //- Tabla y Gráfico (Esqueleto)
+  //- Tabla y Gráfico
   .row.g-4
     .col-md-8
       .card-custom.h-100
@@ -64,24 +64,24 @@ block content
                   th Stock Actual
                   th Estado
               tbody
-                tr
-                  td.text-muted #001
-                  td.fw-bold Teclado Mecánico RGB
-                  td 5
-                  td
-                    span.badge.bg-danger Crítico
-                tr
-                  td.text-muted #045
-                  td.fw-bold Monitor 24" 144Hz
-                  td 8
-                  td
-                    span.badge.bg-warning.text-dark Riesgo
-                tr
-                  td.text-muted #023
-                  td.fw-bold Mouse Inalámbrico
-                  td 12
-                  td
-                    span.badge.bg-warning.text-dark Riesgo
+                if lowStockProducts && lowStockProducts.length > 0
+                  each prod in lowStockProducts
+                    tr
+                      td.text-muted ##{prod.id}
+                      td.fw-bold= prod.nombre
+                      td= prod.stock
+                      td
+                        if prod.stock === 0
+                          span.badge.bg-danger Agotado
+                        else if prod.stock <= 3
+                          span.badge.bg-danger Crítico
+                        else if prod.stock <= 7
+                          span.badge.bg-warning.text-dark Riesgo
+                        else
+                          span.badge.bg-info Bajo
+                else
+                  tr
+                    td(colspan="4").text-center.text-muted.p-4 No hay productos con bajo stock
 
     .col-md-4
       .card-custom.h-100
@@ -91,23 +91,29 @@ block content
               i.fa-solid.fa-chart-pie.me-2
               | Distribución de Inventario
           .p-4.flex-grow-1.d-flex.justify-content-center.align-items-center
-            canvas#inventoryChart(style="max-height: 250px; width: 100%;")
+            .chart-wrapper.w-100
+              canvas#inventoryChart(style="max-height: 250px; width: 100%;")
+
+  //- Hidden data for chart
+  script.
+    window.__inventoryData = !{chartData};
 
 block scripts
   script(src="https://cdn.jsdelivr.net/npm/chart.js")
   script.
     document.addEventListener("DOMContentLoaded", function() {
+      var data = window.__inventoryData || [0, 0, 0];
       const ctx = document.getElementById('inventoryChart').getContext('2d');
       new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['En Stock', 'Bajo Stock', 'Agotado'],
+          labels: ['Normal (≥10)', 'Bajo Stock (<10)', 'Agotado (0)'],
           datasets: [{
-            data: [1230, 12, 3],
+            data: data,
             backgroundColor: [
-              '#198754', // success
-              '#ffc107', // warning
-              '#dc3545'  // danger
+              '#198754',
+              '#ffc107',
+              '#dc3545'
             ],
             borderWidth: 0,
             hoverOffset: 4
@@ -117,6 +123,12 @@ block scripts
           responsive: true,
           maintainAspectRatio: false,
           cutout: '70%',
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1100,
+            easing: 'easeOutCirc'
+          },
           plugins: {
             legend: {
               position: 'bottom',

@@ -29,16 +29,16 @@ block content
               each venta in ventas
                 tr
                   td.text-muted ##{venta.id}
-                  td.fw-bold #{venta.cliente}
-                  td #{venta.producto}
-                  td.fw-bold(style="color: var(--color-teal);") $#{venta.monto}
-                  td.small.text-muted #{new Date(venta.fecha).toLocaleString()}
+                  td.fw-bold= venta.cliente_nombre || 'Desconocido'
+                  td= venta.producto_nombre || 'N/A'
+                  td.fw-bold(style="color: var(--color-teal);") $#{venta.total}
+                  td.small.text-muted= new Date(venta.fecha_emision).toLocaleString()
                   td
                     .d-flex.gap-2
                       a.btn.btn-sm.btn-outline-custom(href=`/ventas/ticket?id=${venta.id}`, title="Ver Ticket (POS)")
                         i.fa-solid.fa-receipt.me-1
                         | Ticket
-                      a.btn.btn-sm.btn-outline-custom(href=`/ventas/factura-view?id=${venta.id}`, title="Ver Factura en PDF a tamaño real")
+                      a.btn.btn-sm.btn-outline-custom(href=`/ventas/factura-view?id=${venta.id}`, title="Ver Factura en PDF")
                         i.fa-solid.fa-file-pdf.me-1
                         | Factura
             else

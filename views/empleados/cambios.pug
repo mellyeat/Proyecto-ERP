@@ -1,0 +1,69 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'empleados'
+  - var title = 'Editar Empleado - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Editar Perfil de Empleado
+    a.btn.btn-outline-secondary(href="/empleados/consultas")
+      i.fa-solid.fa-arrow-left.me-2
+      | Volver al Directorio
+
+  form(action="/empleados/edit", method="POST")
+    input(type="hidden", name="id", value=empleado.id)
+    .row.g-4
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-user.me-2
+                | 1. Datos Personales
+            .p-4
+              .mb-3
+                label.form-label.text-muted.small Nombre Completo
+                input.form-control.bg-light(type="text", name="nombre_completo", value=empleado.nombre_completo, required)
+              .mb-3
+                label.form-label.text-muted.small Puesto
+                input.form-control.bg-light(type="text", name="puesto", value=empleado.puesto)
+              .mb-3
+                label.form-label.text-muted.small Salario Mensual ($)
+                input.form-control.bg-light(type="number", step="0.01", name="salario", value=empleado.salario)
+              .mb-3
+                .form-check.form-switch
+                  input.form-check-input#activoCheck(type="checkbox", name="activo", checked=(empleado.activo == 1 || empleado.activo == true))
+                  label.form-check-label(for="activoCheck") Empleado Activo
+
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-key.me-2
+                | 2. Acceso al Sistema
+            .p-4
+              .mb-3
+                label.form-label.text-muted.small Usuario (Login)
+                input.form-control.bg-light(type="text", name="usuario", value=empleado.usuario, required)
+              .mb-3
+                label.form-label.text-muted.small Contraseña
+                .input-group
+                  input.form-control.bg-light(type="password", name="password_new", placeholder="Dejar vacío para no cambiar")
+                  span.input-group-text
+                    i.fa-solid.fa-lock.text-muted
+                .form-text.text-muted Deja vacío para mantener la contraseña actual
+              .mb-3
+                label.form-label.text-muted.small Rol del Sistema
+                select.form-select.bg-light(name="rol", required)
+                  option(value="admin", selected=(empleado.rol == 'admin')) Administrador (Acceso Total)
+                  option(value="RH", selected=(empleado.rol == 'RH')) RH – Recursos Humanos
+                  option(value="VENTAS", selected=(empleado.rol == 'VENTAS')) VENTAS – Módulo de Ventas
+                  option(value="COMPRAS", selected=(empleado.rol == 'COMPRAS')) COMPRAS – Módulo de Compras
+
+    .row.mt-4
+      .col-12.text-end
+        button.btn.btn-warning.text-dark.fw-bold.px-5.py-2(type="submit")
+          i.fa-solid.fa-pencil.me-2
+          | Guardar Cambios
