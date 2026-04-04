@@ -310,15 +310,113 @@ router.get('/ventas/consultas', verificarSesion, verificarRol(['VENTAS']), (req,
 });
 
 router.get('/ventas/facturas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
-    res.render('ventas/facturas');
-});
-
-router.get('/ventas/factura-view', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
-    res.render('ventas/factura-view');
+    db.query(`
+        SELECT 
+            v.id, v.subtotal, v.iva, v.total, v.estado,
+            v.folio_fiscal, v.fecha_emision,
+            c.nombre_comercial AS cliente_nombre
+        FROM ventas v
+        LEFT JOIN clientes c ON v.cliente_id = c.id
+        WHERE v.tipo_comprobante = 'Factura'
+        ORDER BY v.fecha_emision DESC
+    `, (err, facturas) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error al cargar facturas");
+        }
+        res.render('ventas/facturas', { facturas: facturas || [] });
+    });
 });
 
 router.get('/ventas/ticket', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
-    res.render('ventas/ticket');
+    const { id } = req.query;
+    if (!id) return res.redirect('/ventas/consultas');
+
+    db.query(`
+        SELECT 
+            v.id, v.subtotal, v.iva, v.total, v.estado, v.fecha_emision,
+            c.nombre_comercial  AS cliente_nombre,
+            eu.nombre_completo  AS cajero_nombre
+        FROM ventas v
+        LEFT JOIN clientes           c  ON v.cliente_id  = c.id
+        LEFT JOIN empleados_usuarios eu ON v.empleado_id = eu.id
+        WHERE v.id = ?
+    `, [id], (err, ventaRows) => {
+        if (err || !ventaRows.length) {
+            console.log(err);
+            return res.redirect('/ventas/consultas');
+        }
+
+        db.query(`
+            SELECT 
+                vd.cantidad,
+                vd.precio_unitario,
+                vd.importe_linea,
+                p.nombre AS producto_nombre
+            FROM venta_detalle vd
+            LEFT JOIN productos p ON vd.producto_id = p.id
+            WHERE vd.venta_id = ?
+        `, [id], (err, detalles) => {
+            if (err) {
+                console.log(err);
+                return res.redirect('/ventas/consultas');
+            }
+
+            res.render('ventas/ticket', {
+                venta: ventaRows[0],
+                detalles: detalles || []
+            });
+        });
+    });
+});
+
+router.get('/ventas/factura-view', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const { id } = req.query;
+    if (!id) return res.redirect('/ventas/consultas');
+
+    db.query(`
+        SELECT 
+            v.id, v.subtotal, v.iva, v.total, v.estado,
+            v.tipo_comprobante, v.folio_fiscal, v.fecha_emision,
+            c.nombre_comercial  AS cliente_nombre,
+            c.razon_social      AS cliente_razon_social,
+            c.rfc               AS cliente_rfc,
+            c.direccion_fiscal  AS cliente_direccion,
+            c.email             AS cliente_email,
+            c.codigo_postal     AS cliente_cp,
+            c.regimen_fiscal    AS cliente_regimen,
+            eu.nombre_completo  AS cajero_nombre
+        FROM ventas v
+        LEFT JOIN clientes           c  ON v.cliente_id  = c.id
+        LEFT JOIN empleados_usuarios eu ON v.empleado_id = eu.id
+        WHERE v.id = ?
+    `, [id], (err, ventaRows) => {
+        if (err || !ventaRows.length) {
+            console.log(err);
+            return res.redirect('/ventas/consultas');
+        }
+
+        db.query(`
+            SELECT 
+                vd.cantidad,
+                vd.precio_unitario,
+                vd.importe_linea,
+                p.nombre AS producto_nombre
+            FROM venta_detalle vd
+            LEFT JOIN productos p ON vd.producto_id = p.id
+            WHERE vd.venta_id = ?
+        `, [id], (err, detalles) => {
+            if (err) {
+                console.log(err);
+                return res.redirect('/ventas/consultas');
+            }
+
+            res.render('ventas/factura-view', {
+                venta: ventaRows[0],
+                detalles: detalles || []
+            });
+        });
+    });
 });
 
 // ================== CLIENTES (CRM) ==================

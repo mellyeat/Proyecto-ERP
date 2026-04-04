@@ -17,57 +17,54 @@ block content
 
   .row
     .col-md-4.mx-auto
-      .card-custom.p-4(style="background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 350px; margin: auto; font-family: monospace;")
-        
-        //- Encabezado Ticket
+      .card-custom.p-4(style="background-color:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); width:350px; margin:auto; font-family:monospace;")
+
+        //- Encabezado
         .text-center.border-bottom.border-dark.border-2.pb-3.mb-3
           h4.fw-bold.mb-1 MINI ERP SYSTEM
           p.small.mb-0 SUCURSAL CENTRO
           p.small.mb-0 Tel: (123) 456-7890
-          p.small.mb-0 Ticket: #008542
-          p.small.mb-0 Fecha: 30/03/2026 14:35
-        
-        //- Datos del Cliente (Opcional en tickets, pero si es necesario)
+          p.small.mb-0 Ticket: ##{venta.id}
+          p.small.mb-0 Fecha: #{new Date(venta.fecha_emision).toLocaleString('es-MX')}
+
+        //- Cliente y cajero
         .mb-3
-          p.small.mb-0 <strong>Cliente:</strong> Empresa ACME
-          p.small.mb-0 <strong>Cajero:</strong> Admin
-        
-        //- Detalles de Venta
+          p.small.mb-0
+            strong Cliente:
+            |  #{venta.cliente_nombre || 'Público General'}
+          p.small.mb-0
+            strong Cajero:
+            |  #{venta.cajero_nombre || 'Admin'}
+
+        //- Productos
         .mb-3
           table.table.table-sm.table-borderless.mb-0
             thead.border-bottom.border-dark
               tr.small.fw-bold
-                th(style="width: 15%") Cant
-                th(style="width: 60%") Artículo
-                th.text-end(style="width: 25%") Importe
+                th(style="width:15%") Cant
+                th(style="width:55%") Artículo
+                th.text-end(style="width:30%") Importe
             tbody.small
-              tr
-                td.text-center 2
-                td Monitor 24" 144Hz
-                td.text-end $280.00
-              tr
-                td.text-center 1
-                td Teclado RGB
-                td.text-end $65.00
-              tr
-                td.text-center 3
-                td Mouse WiFi
-                td.text-end $75.00
+              each detalle in detalles
+                tr
+                  td.text-center= detalle.cantidad
+                  td= detalle.producto_nombre
+                  td.text-end $#{parseFloat(detalle.importe_linea).toFixed(2)}
 
         //- Totales
         .border-top.border-dark.border-2.pt-2.mt-2
           .d-flex.justify-content-between.small.mb-1
             span Subtotal:
-            span $420.00
+            span $#{parseFloat(venta.subtotal).toFixed(2)}
           .d-flex.justify-content-between.small.mb-1
-            span IVA:
-            span $67.20
+            span IVA (16%):
+            span $#{parseFloat(venta.iva).toFixed(2)}
           .d-flex.justify-content-between.fw-bold.fs-5.mt-2
             span TOTAL:
-            span $487.20
+            span $#{parseFloat(venta.total).toFixed(2)}
 
-        //- Pie de Ticket
-        .text-center.mt-4.pt-3.border-top.border-dark.border-dashed
+        //- Pie
+        .text-center.mt-4.pt-3.border-top.border-dark
           p.small.mb-1 ¡GRACIAS POR SU COMPRA!
           p.small.mb-0 Vuelva pronto a Mini ERP
           p.small.text-muted.mt-2.mb-0 * Conservar ticket para cambios *
