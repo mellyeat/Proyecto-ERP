@@ -43,41 +43,6 @@ router.post('/login', (req, res) => {
     );
 });
 
-// Creacion de registros
-router.get('/registro', (req, res) => {
-    res.render('registro');
-});
-router.post('/registro', (req, res) => {
-    const { usuario, password } = req.body;
-
-    db.query(
-        "SELECT * FROM empleados_usuarios WHERE usuario = ?",
-        [usuario],
-        (err, results) => {
-            if (err) {
-                console.log(err);
-                return res.send("Error");
-            }
-
-            if (results.length > 0) {
-                return res.render('registro', { error: "El usuario ya está registrado" });
-            }
-
-            db.query(
-                "INSERT INTO empleados_usuarios (usuario, password, nombre_completo, puesto) VALUES (?, ?, 'Nuevo Usuario', 'Vendedor')",
-                [usuario, password],
-                (err) => {
-                    if (err) {
-                        console.log(err);
-                        return res.send("Error al registrar");
-                    }
-                    res.redirect('/');
-                }
-            );
-        }
-    );
-});
-
 // Dashboard
 router.get('/dashboard', verificarSesion, (req, res) => {
 
