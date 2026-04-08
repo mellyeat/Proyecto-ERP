@@ -155,6 +155,32 @@ html(lang="es")
                         i.fa-solid.fa-address-book.me-2
                         | Directorio
 
+            if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'VENTAS')
+              li.nav-item
+                a.nav-link.sidebar-link(
+                  data-bs-toggle="collapse",
+                  href="#cotizacionesMenu",
+                  role="button",
+                  aria-expanded=(activePage === 'cotizaciones' ? 'true' : 'false'),
+                  aria-controls="cotizacionesMenu",
+                  class=(activePage === 'cotizaciones' ? 'active' : '')
+                )
+                  i.fa-solid.fa-file-signature.me-2
+                  | Cotizaciones
+                  i.fa-solid.fa-chevron-down.float-end.mt-1(style="font-size: 0.8rem;")
+                
+                .collapse(id="cotizacionesMenu", class=(activePage === 'cotizaciones' ? 'show' : ''))
+                  ul.nav.flex-column.ms-3.mt-2
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/cotizaciones/altas") 
+                        i.fa-solid.fa-plus-circle.me-2
+                        | Nueva Cotización
+                    li.nav-item
+                      a.nav-link.sidebar-link.small.py-1(href="/cotizaciones/consultas")
+                        i.fa-solid.fa-list.me-2
+                        | Historial
+
+
           .mt-auto.p-3
             .text-center.text-white-50.small
               | © 2026 ERP System

@@ -1,0 +1,52 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'cotizaciones'
+  - var title = 'Historial de Cotizaciones - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Historial de Cotizaciones
+    a.btn.btn-primary-custom(href="/cotizaciones/altas")
+      i.fa-solid.fa-plus.me-2
+      | Nueva Cotización
+
+  .card-custom
+    .card-body.p-0
+      .p-3.border-bottom
+        h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
+          i.fa-solid.fa-list.me-2
+          | Listado de Cotizaciones Registradas
+      .table-responsive
+        table.table.table-custom.mb-0
+          thead
+            tr
+              th Folio
+              th Cliente
+              th Fecha
+              th Total
+              th Estado
+              th Acciones
+          tbody
+            if cotizaciones && cotizaciones.length > 0
+              each coti in cotizaciones
+                tr
+                  td.text-muted.fw-bold C-#{String(coti.id).padStart(5, '0')}
+                  td.fw-bold #{coti.cliente_nombre || 'Desconocido'}
+                  td.small.text-muted= new Date(coti.fecha_emision).toLocaleDateString('es-MX')
+                  td.fw-bold(style="color: var(--color-teal);") $#{coti.total}
+                  td
+                    if coti.estado === 'Convertida'
+                      span.badge.bg-success Convertida a Venta
+                    else
+                      span.badge.bg-warning.text-dark Pendiente
+                  td
+                    .d-flex.gap-2
+                      a.btn.btn-sm.btn-info.text-white(href=`/cotizaciones/view?id=${coti.id}`, target="_blank", title="Ver Documento / Imprimir")
+                        i.fa-solid.fa-print
+                      if coti.estado === 'Pendiente'
+                        a.btn.btn-sm.btn-success(href=`/cotizaciones/convertir?id=${coti.id}`, title="Convertir a Venta", onclick="return confirm('¿Seguro que deseas convertir esta cotización en venta real? Esto restará stock temporalmente.')")
+                          i.fa-solid.fa-money-bill-wave
+            else
+              tr
+                td(colspan="6").text-center.text-muted.p-4 No hay cotizaciones registradas

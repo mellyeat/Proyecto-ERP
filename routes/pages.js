@@ -551,6 +551,146 @@ router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']), (req, res)
     });
 });
 
+// ================== COTIZACIONES ==================
+router.get('/cotizaciones/consultas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    db.query(`
+        SELECT c.*, cl.nombre_comercial AS cliente_nombre 
+        FROM cotizaciones c 
+        LEFT JOIN clientes cl ON c.cliente_id = cl.id 
+        ORDER BY c.fecha_emision DESC
+    `, (err, cotizaciones) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error fetching cotizaciones");
+        }
+        res.render('cotizaciones/consultas', { cotizaciones: cotizaciones || [] });
+    });
+});
+
+router.get('/cotizaciones/altas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    db.query("SELECT id, nombre, precio FROM productos WHERE stock > 0", (err, productos) => {
+        if (err) console.log(err);
+        db.query("SELECT id, nombre_comercial FROM clientes", (err, clientes) => {
+            if (err) console.log(err);
+            res.render('cotizaciones/altas', { productos: productos || [], clientes: clientes || [] });
+        });
+    });
+});
+
+router.post('/cotizaciones/add', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const { cliente_id, producto_id, cantidad, vigencia_dias } = req.body;
+
+    db.query("SELECT * FROM productos WHERE id = ?", [producto_id], (err, result) => {
+        if (err || result.length === 0) return res.send("Producto no encontrado");
+
+        const prod = result[0];
+        const subtotal = prod.precio * cantidad;
+        const iva = subtotal * 0.16;
+        const total = subtotal + iva;
+        const empleado = req.session.usuario ? req.session.usuario.id : null;
+        let vigencia = vigencia_dias || 15;
+
+        db.query(
+            "INSERT INTO cotizaciones (cliente_id, empleado_id, subtotal, iva, total, vigencia_dias) VALUES (?, ?, ?, ?, ?, ?)",
+            [cliente_id, empleado, subtotal, iva, total, vigencia],
+            (err, cotiResult) => {
+                if (err) { console.log(err); return res.status(500).send("Error adding cotización"); }
+                
+                const cotiId = cotiResult.insertId;
+                db.query(
+                    "INSERT INTO cotizacion_detalle (cotizacion_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES (?, ?, ?, ?, ?)",
+                    [cotiId, producto_id, cantidad, prod.precio, subtotal],
+                    (err) => {
+                        res.redirect('/cotizaciones/consultas');
+                    }
+                );
+            }
+        );
+    });
+});
+
+router.get('/cotizaciones/view', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const { id } = req.query;
+    if (!id) return res.redirect('/cotizaciones/consultas');
+
+    db.query(`
+        SELECT 
+            c.*,
+            cl.nombre_comercial  AS cliente_nombre,
+            cl.razon_social      AS cliente_razon_social,
+            cl.rfc               AS cliente_rfc,
+            cl.direccion_fiscal  AS cliente_direccion,
+            cl.email             AS cliente_email,
+            eu.nombre_completo   AS cajero_nombre
+        FROM cotizaciones c
+        LEFT JOIN clientes cl ON c.cliente_id = cl.id
+        LEFT JOIN empleados_usuarios eu ON c.empleado_id = eu.id
+        WHERE c.id = ?
+    `, [id], (err, cotiRows) => {
+        if (err || !cotiRows.length) {
+            console.log(err);
+            return res.redirect('/cotizaciones/consultas');
+        }
+
+        db.query(`
+            SELECT 
+                cd.cantidad, cd.precio_unitario, cd.importe_linea, p.nombre AS producto_nombre
+            FROM cotizacion_detalle cd
+            LEFT JOIN productos p ON cd.producto_id = p.id
+            WHERE cd.cotizacion_id = ?
+        `, [id], (err, detalles) => {
+            if (err) console.log(err);
+            res.render('cotizaciones/view', {
+                cotizacion: cotiRows[0],
+                detalles: detalles || []
+            });
+        });
+    });
+});
+
+router.get('/cotizaciones/convertir', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const { id } = req.query;
+    if (!id) return res.redirect('/cotizaciones/consultas');
+
+    db.query("SELECT * FROM cotizaciones WHERE id = ? AND estado = 'Pendiente'", [id], (err, cotiResult) => {
+        if (err || cotiResult.length === 0) return res.redirect('/cotizaciones/consultas');
+        const coti = cotiResult[0];
+
+        db.query("SELECT * FROM cotizacion_detalle WHERE cotizacion_id = ?", [id], (err, detalles) => {
+            if (err || detalles.length === 0) return res.redirect('/cotizaciones/consultas');
+            const det = detalles[0]; // currently single item supported
+
+            // Check stock first
+            db.query("SELECT stock FROM productos WHERE id = ?", [det.producto_id], (err, prodResult) => {
+                if (err || prodResult.length === 0 || prodResult[0].stock < det.cantidad) {
+                    return res.send("Error: Stock insuficiente para convertir esta cotización.");
+                }
+
+                db.query(
+                    "INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, tipo_comprobante) VALUES (?, ?, ?, ?, ?, 'Ticket')",
+                    [coti.cliente_id, coti.empleado_id, coti.subtotal, coti.iva, coti.total],
+                    (err, ventaResult) => {
+                        if (err) return res.status(500).send("Error creating sale from quote");
+                        const ventaId = ventaResult.insertId;
+
+                        db.query(
+                            "INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES (?, ?, ?, ?, ?)",
+                            [ventaId, det.producto_id, det.cantidad, det.precio_unitario, det.importe_linea],
+                            (err) => {
+                                db.query("UPDATE productos SET stock = stock - ? WHERE id = ?", [det.cantidad, det.producto_id], () => {
+                                    db.query("UPDATE cotizaciones SET estado = 'Convertida' WHERE id = ?", [id], () => {
+                                        res.redirect('/ventas/consultas');
+                                    });
+                                });
+                            }
+                        );
+                    }
+                );
+            });
+        });
+    });
+});
+
 // API métricas
 router.get('/api/metricas', verificarSesion, (req, res) => {
     db.query(`

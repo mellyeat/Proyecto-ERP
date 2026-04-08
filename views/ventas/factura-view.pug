@@ -12,16 +12,16 @@ block content
       button.btn.btn-outline-custom.me-2(type="button")
         i.fa-solid.fa-envelope.me-2
         | Enviar por Correo
-      button.btn.btn-primary-custom.me-2(type="button", onclick="window.print()")
-        i.fa-solid.fa-print.me-2
-        | Imprimir PDF
+      button.btn.btn-primary-custom.me-2(type="button", onclick="descargarPDF()")
+        i.fa-solid.fa-file-pdf.me-2
+        | Descargar PDF
       a.btn.btn-secondary(href="/ventas/consultas")
         i.fa-solid.fa-arrow-left.me-2
         | Volver al Historial
 
   .row
     .col-md-8.mx-auto
-      .card-custom.p-5(style="background-color:#fff; box-shadow:0 0 20px rgba(0,0,0,0.05);")
+      .card-custom.p-5#printableArea(style="background-color:#fff; box-shadow:0 0 20px rgba(0,0,0,0.05);")
 
         //- Encabezado empresa
         .row.border-bottom.pb-4.mb-4
@@ -98,3 +98,18 @@ block content
           p.text-muted.small.mb-0 Este documento es una representación impresa de un CFDI.
           if venta.cajero_nombre
             p.text-muted.small.mt-2.mb-0 Atendido por: #{venta.cajero_nombre}
+
+block scripts
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js")
+  script.
+    function descargarPDF() {
+      const element = document.getElementById('printableArea');
+      const opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     'Factura.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
