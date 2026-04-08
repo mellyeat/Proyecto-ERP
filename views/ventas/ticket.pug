@@ -103,47 +103,6 @@ block content
           p.small.mb-0 Vuelva pronto
           p.small.text-muted.mt-2.mb-0 * Conservar ticket para cambios *
 
-extends ../layout/main.pug
-
-block content
-  //- Estilos de refuerzo para el PDF
-  style.
-    /* Esto solo afecta al PDF cuando html2pdf captura el div */
-    .force-pdf-dark * {
-      color: #000000 !important;
-      opacity: 1 !important;
-      border-color: #000000 !important;
-      -webkit-print-color-adjust: exact;
-    }
-    .force-pdf-dark .badge {
-      background-color: #000 !important;
-      color: #fff !important;
-    }
-    .force-pdf-dark .table th {
-      background-color: #f2f2f2 !important;
-      color: #000 !important;
-    }
-
-  //- Botones
-  .d-flex.justify-content-between.align-items-center.mb-4.no-print
-    h2.fw-bold(style="color: var(--color-dark-teal);") Visualizador de Factura
-    button.btn.btn-primary(onclick="descargarPDF()") Descargar PDF
-
-  .row
-    .col-md-9.mx-auto
-      //- Mantenemos tu ID original
-      #printableArea.card-custom.p-5(style="background-color: #fff !important;")
-        //- ... (Todo tu contenido de la factura igual que antes) ...
-        .row.border-bottom.pb-4.mb-4
-          .col-6
-            h3.fw-bold(style="color: var(--color-dark-teal);") Mini ERP System
-            p.text-muted.small.mb-0 123 Calle Falsa, Ciudad
-          .col-6.text-end
-            h2.fw-light FACTURA
-            h6.fw-bold #INV-2026-#{folio}
-        
-        //- ... resto del contenido ...
-
 block scripts
   script(src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js")
   script.
@@ -151,23 +110,31 @@ block scripts
       const element = document.getElementById('printableArea');
       
       const opt = {
-        margin:       10,
+        margin:       [10, 10, 10, 10],
         filename:     'Factura_#{folio}.pdf',
-        // CAMBIO: Usamos PNG para evitar que el JPG lave los colores
-        image:        { type: 'png', quality: 1 }, 
+        image:        { type: 'jpeg', quality: 1 },
         html2canvas:  { 
-          scale: 2, // Bajamos un poco el scale para que no sature el brillo
-          useCORS: true,
+          scale: 3, 
+          useCORS: true, 
           backgroundColor: '#ffffff',
-          // FORZAMOS que el navegador dibuje todo con contraste alto
+          scrollY: 0,
+          // ESTA ES LA MAGIA: Forzamos a que todo sea legible en la copia del PDF
           onclone: (doc) => {
-            const el = doc.getElementById('printableArea');
-            el.style.setProperty('color', '#000000', 'important');
-            // Buscamos cada texto y lo ponemos negro sólido
-            doc.querySelectorAll('#printableArea *').forEach(node => {
-              node.style.setProperty('color', '#000000', 'important');
-              node.style.setProperty('opacity', '1', 'important');
-            });
+            const pdfView = doc.getElementById('printableArea');
+            // Ponemos todo el texto en negro puro para que no se vea pálido
+            const allElements = pdfView.getElementsByTagName('*');
+            for (let el of allElements) {
+              // Si no es un badge, forzamos negro
+              if (!el.classList.contains('badge')) {
+                el.style.color = '#000000';
+                el.style.opacity = '1';
+              }
+            }
+            // Forzamos que las líneas de la tabla sean negras y visibles
+            const tables = pdfView.getElementsByTagName('table');
+            for (let table of tables) {
+              table.style.borderColor = '#000000';
+            }
           }
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
