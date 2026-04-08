@@ -6,6 +6,46 @@ block variables
   - var folio = String(venta.id).padStart(4, '0')
 
 block content
+  style.
+    .a4-container {
+      background: #fff;
+      margin: 0 auto;
+      padding: 40px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    .company-header {
+      border-bottom: 2px solid #000;
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+    }
+    .brand-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .invoice-details p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printableArea, #printableArea * {
+        visibility: visible;
+      }
+      #printableArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        box-shadow: none;
+        padding: 0;
+      }
+      .a4-container { margin: 0; }
+    }
+
   .d-flex.justify-content-between.align-items-center.mb-4
     h2.fw-bold(style="color: var(--color-dark-teal);") Visualizador de Factura
     div
@@ -20,21 +60,19 @@ block content
         | Volver al Historial
 
   .row
-    .col-md-8.mx-auto
-      .card-custom.p-5#printableArea(style="background-color:#fff; box-shadow:0 0 20px rgba(0,0,0,0.05);")
-
-        //- Encabezado empresa
-        .row.border-bottom.pb-4.mb-4
-          .col-md-6
-            h3.fw-bold(style="color: var(--color-dark-teal);") Mini ERP System
-            p.text-muted.small.mb-0 123 Calle Falsa, Ciudad
+    .col-md-9.mx-auto
+      .a4-container#printableArea
+        .company-header.d-flex.justify-content-between.align-items-center
+          div
+            .brand-title Mi Empresa ERP
+            p.text-muted.mb-0 Soluciones Integrales
             p.text-muted.small.mb-0 RFC: XAXX010101000
             p.text-muted.small.mb-0 contacto@minierp.com
-          .col-md-6.text-end
-            h2.fw-light.text-uppercase FACTURA
-            h6.fw-bold.text-muted #INV-2026-#{folio}
-            p.text-muted.small.mb-0 
-              | Fecha: #{new Date(venta.fecha_emision).toLocaleDateString('es-MX', {year:'numeric', month:'long', day:'numeric'})}
+          div.text-end.invoice-details
+            h3.fw-bold FACTURA
+            p Folio: 
+              strong #INV-2026-#{folio}
+            p Fecha: #{new Date(venta.fecha_emision).toLocaleDateString('es-MX')}
             .mt-2
               - var estadoColor = venta.estado === 'Pagada' ? 'success' : 'warning'
               span(class=`badge bg-${estadoColor}`)= venta.estado
