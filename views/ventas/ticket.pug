@@ -5,40 +5,74 @@ block variables
   - var title = 'Ticket de Compra - ERP'
 
 block content
-  .d-flex.justify-content-between.align-items-center.mb-4
+  //- Estilos específicos para visualización y PDF
+  style.
+    .ticket-container {
+      background-color: #ffffff !important;
+      width: 350px;
+      margin: 20px auto;
+      padding: 20px;
+      font-family: 'Courier New', Courier, monospace;
+      color: #000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border: 1px solid #eee;
+    }
+    
+    /* Ajustes para que las tablas se vean bien en el PDF */
+    .ticket-container table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    @media print {
+      .no-print { display: none !important; }
+      body { background: none; }
+      .ticket-container { 
+        box-shadow: none; 
+        border: none; 
+        margin: 0; 
+        width: 100%;
+      }
+    }
+
+  //- Botones de acción (No se verán en el PDF)
+  .d-flex.justify-content-between.align-items-center.mb-4.no-print
     h2.fw-bold(style="color: var(--color-dark-teal);") Visualizador de Ticket
     div
-      button.btn.btn-outline-custom.me-2(type="button", onclick="descargarPDF()")
+      button.btn.btn-danger.me-2(type="button", onclick="descargarPDF()")
         i.fa-solid.fa-file-pdf.me-2
         | Descargar PDF
+      button.btn.btn-outline-primary.me-2(type="button", onclick="window.print()")
+        i.fa-solid.fa-print.me-2
+        | Imprimir
       a.btn.btn-secondary(href="/ventas/consultas")
         i.fa-solid.fa-arrow-left.me-2
-        | Volver al Historial
+        | Volver
 
   .row
-    .col-md-4.mx-auto
-      .card-custom.p-4#printableArea(style="background-color:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); width:350px; margin:auto; font-family:monospace;")
-
+    .col-12
+      //- Este es el div que capturará el PDF
+      #printableArea.ticket-container
         //- Encabezado
-        .text-center.border-bottom.border-dark.border-2.pb-3.mb-3
+        .text-center.border-bottom.border-dark.pb-3.mb-3
           h4.fw-bold.mb-1 MINI ERP SYSTEM
           p.small.mb-0 SUCURSAL CENTRO
           p.small.mb-0 Tel: (123) 456-7890
           p.small.mb-0 Ticket: ##{venta.id}
           p.small.mb-0 Fecha: #{new Date(venta.fecha_emision).toLocaleString('es-MX')}
 
-        //- Cliente y cajero
+        //- Información de Venta
         .mb-3
           p.small.mb-0
-            strong Cliente:
-            |  #{venta.cliente_nombre || 'Público General'}
+            strong Cliente: 
+            | #{venta.cliente_nombre || 'Público General'}
           p.small.mb-0
-            strong Cajero:
-            |  #{venta.cajero_nombre || 'Admin'}
+            strong Cajero: 
+            | #{venta.cajero_nombre || 'Admin'}
 
-        //- Productos
+        //- Tabla de Productos
         .mb-3
-          table.table.table-sm.table-borderless.mb-0
+          table.table.table-sm.table-borderless
             thead.border-bottom.border-dark
               tr.small.fw-bold
                 th(style="width:15%") Cant
@@ -63,22 +97,81 @@ block content
             span TOTAL:
             span $#{parseFloat(venta.total).toFixed(2)}
 
-        //- Pie
+        //- Pie de página
         .text-center.mt-4.pt-3.border-top.border-dark
           p.small.mb-1 ¡GRACIAS POR SU COMPRA!
+          p.small.mb-0 Vuelva pronto
           p.small.text-muted.mt-2.mb-0 * Conservar ticket para cambios *
+
+extends ../layout/main.pug
+
+block content
+  //- Estilos de refuerzo para el PDF
+  style.
+    /* Esto solo afecta al PDF cuando html2pdf captura el div */
+    .force-pdf-dark * {
+      color: #000000 !important;
+      opacity: 1 !important;
+      border-color: #000000 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .force-pdf-dark .badge {
+      background-color: #000 !important;
+      color: #fff !important;
+    }
+    .force-pdf-dark .table th {
+      background-color: #f2f2f2 !important;
+      color: #000 !important;
+    }
+
+  //- Botones
+  .d-flex.justify-content-between.align-items-center.mb-4.no-print
+    h2.fw-bold(style="color: var(--color-dark-teal);") Visualizador de Factura
+    button.btn.btn-primary(onclick="descargarPDF()") Descargar PDF
+
+  .row
+    .col-md-9.mx-auto
+      //- Mantenemos tu ID original
+      #printableArea.card-custom.p-5(style="background-color: #fff !important;")
+        //- ... (Todo tu contenido de la factura igual que antes) ...
+        .row.border-bottom.pb-4.mb-4
+          .col-6
+            h3.fw-bold(style="color: var(--color-dark-teal);") Mini ERP System
+            p.text-muted.small.mb-0 123 Calle Falsa, Ciudad
+          .col-6.text-end
+            h2.fw-light FACTURA
+            h6.fw-bold #INV-2026-#{folio}
+        
+        //- ... resto del contenido ...
 
 block scripts
   script(src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js")
   script.
     function descargarPDF() {
       const element = document.getElementById('printableArea');
+      
       const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     'Ticket.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        margin:       10,
+        filename:     'Factura_#{folio}.pdf',
+        // CAMBIO: Usamos PNG para evitar que el JPG lave los colores
+        image:        { type: 'png', quality: 1 }, 
+        html2canvas:  { 
+          scale: 2, // Bajamos un poco el scale para que no sature el brillo
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          // FORZAMOS que el navegador dibuje todo con contraste alto
+          onclone: (doc) => {
+            const el = doc.getElementById('printableArea');
+            el.style.setProperty('color', '#000000', 'important');
+            // Buscamos cada texto y lo ponemos negro sólido
+            doc.querySelectorAll('#printableArea *').forEach(node => {
+              node.style.setProperty('color', '#000000', 'important');
+              node.style.setProperty('opacity', '1', 'important');
+            });
+          }
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
+
       html2pdf().set(opt).from(element).save();
     }
