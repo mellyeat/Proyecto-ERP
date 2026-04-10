@@ -12,7 +12,10 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// Esto elimina el cache
+//archivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Esto elimina el cache de las peticiones dinámicas
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.set('Pragma', 'no-cache');
@@ -23,10 +26,6 @@ app.use((req, res, next) => {
 //motor de vistas
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.urlencoded({ extended: true }));
-
-//archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

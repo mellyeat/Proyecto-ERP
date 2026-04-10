@@ -63,6 +63,25 @@ block content
                     style="color: var(--color-teal);"
                   )
 
+              //- Opción de facturación
+              .mb-4.p-3.rounded-3(style="background: linear-gradient(135deg, rgba(9,99,126,0.06), rgba(8,131,149,0.06)); border: 1px solid rgba(9,99,126,0.15);")
+                .d-flex.align-items-center.justify-content-between
+                  div
+                    .fw-bold.small(style="color: var(--color-dark-teal);")
+                      i.fa-solid.fa-file-invoice.me-2
+                      | ¿Generar factura?
+                    .text-muted(style="font-size: 0.75rem;")
+                      | Se creará con estatus "Pendiente por pagar"
+                  .form-check.form-switch.mb-0
+                    input.form-check-input(
+                      type="checkbox",
+                      name="generar_factura",
+                      id="generarFactura",
+                      value="si",
+                      role="switch",
+                      style="width: 3rem; height: 1.5rem; cursor: pointer;"
+                    )
+
               button.btn.btn-primary-custom.w-100(type="submit") Confirmar Venta
 
 block scripts

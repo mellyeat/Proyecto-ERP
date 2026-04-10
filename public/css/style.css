@@ -407,3 +407,112 @@ body {
 .notif-footer a:hover {
   color: var(--color-dark-teal);
 }
+
+/* =============================================
+   MOBILE RESPONSIVE LAYOUT (OFF-CANVAS & BOTTOM NAV)
+   ============================================= */
+@media (max-width: 767.98px) {
+  /* Ensure content doesn't get hidden behind the bottom nav */
+  body {
+    padding-bottom: 75px !important;
+  }
+
+  /* Off-canvas sidebar */
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -280px; 
+    bottom: 0;
+    width: 260px;
+    z-index: 1055;
+    transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background-color: var(--color-dark-teal);
+    overflow-y: auto; 
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  }
+
+  .sidebar.show {
+    left: 0;
+  }
+
+  /* Bottom Tab Navigation */
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--color-white);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+    z-index: 1040;
+    justify-content: space-around;
+    padding: 10px 0 5px 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+
+  /* Top Navbar */
+  .top-navbar {
+    z-index: 1040;
+    position: sticky;
+    top: 0;
+  }
+
+  /* Dropdown panels matching mobile width */
+  .notif-panel {
+    width: calc(100vw - 30px);
+    right: -60px;
+  }
+
+  .notif-panel::before {
+    right: 70px;
+  }
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Desktop Bottom Nav hide */
+.bottom-nav {
+  display: none;
+}
+
+.bottom-nav-item {
+  color: var(--color-dark-teal);
+  text-decoration: none;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.2s;
+  opacity: 0.6;
+}
+
+.bottom-nav-item.active,
+.bottom-nav-item:hover {
+  text-decoration: none;
+  color: var(--color-teal);
+  opacity: 1;
+}
+
+.bottom-nav-item i {
+  font-size: 1.3rem;
+  margin-bottom: 3px;
+}

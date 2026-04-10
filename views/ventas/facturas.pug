@@ -5,15 +5,123 @@ block variables
   - var title = 'Facturación - ERP'
 
 block content
-  .d-flex.justify-content-between.align-items-center.mb-4
-    h2.fw-bold(style="color: var(--color-dark-teal);") Todas las Facturas Generadas
+  style.
+    .status-filter-btn {
+      border: 1px solid rgba(9,99,126,0.2);
+      background: transparent;
+      color: var(--color-dark-teal);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .status-filter-btn:hover,
+    .status-filter-btn.active {
+      background: var(--color-dark-teal);
+      color: #fff;
+      border-color: var(--color-dark-teal);
+      box-shadow: 0 2px 8px rgba(9,99,126,0.25);
+    }
+    .status-select {
+      border: 1px solid rgba(9,99,126,0.2);
+      border-radius: 6px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      background: #fff;
+      min-width: 120px;
+    }
+    .status-select:focus {
+      border-color: var(--color-teal);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(9,99,126,0.1);
+    }
+    .toast-status {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.85rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.35s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .toast-status.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-  .card-custom
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Facturación
+
+  //- Tarjetas de Métricas (mismo patrón que ventas, productos, clientes)
+  .row.g-4.mb-4
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Total Facturas
+            h3.fw-bold.mb-0#countTotal= facturas.length
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(9, 99, 126, 0.1);")
+            i.fa-solid.fa-file-invoice.fs-3(style="color: var(--color-dark-teal);")
+
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Pendientes
+            h3.fw-bold.mb-0#countPendiente= facturas.filter(f => f.estado === 'Pendiente').length
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(255, 193, 7, 0.1);")
+            i.fa-solid.fa-clock.fs-3.text-warning
+
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Pagadas
+            h3.fw-bold.mb-0#countPagada= facturas.filter(f => f.estado === 'Pagada').length
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(25, 135, 84, 0.1);")
+            i.fa-solid.fa-circle-check.fs-3.text-success
+
+    .col-md-3
+      .card-custom.p-3
+        .d-flex.justify-content-between.align-items-center
+          div
+            h6.text-muted.mb-1 Vencidas
+            h3.fw-bold.mb-0#countVencida= facturas.filter(f => f.estado === 'Vencida').length
+          .icon-box.p-3.rounded-circle(style="background-color: rgba(220, 53, 69, 0.1);")
+            i.fa-solid.fa-circle-exclamation.fs-3.text-danger
+
+  //- Tabla de facturas
+  .card-custom.h-100
     .card-body.p-0
-      .p-3.border-bottom
+      .p-3.border-bottom.d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
         h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
           i.fa-solid.fa-file-invoice.me-2
           | Archivo Fiscal
+        .d-flex.gap-2.flex-wrap
+          button.status-filter-btn.active(data-filter="todas", onclick="filtrarFacturas('todas', this)")
+            i.fa-solid.fa-layer-group.me-1
+            | Todas
+          button.status-filter-btn(data-filter="Pendiente", onclick="filtrarFacturas('Pendiente', this)")
+            i.fa-solid.fa-clock.me-1
+            | Pendientes
+          button.status-filter-btn(data-filter="Pagada", onclick="filtrarFacturas('Pagada', this)")
+            i.fa-solid.fa-circle-check.me-1
+            | Pagadas
+          button.status-filter-btn(data-filter="Vencida", onclick="filtrarFacturas('Vencida', this)")
+            i.fa-solid.fa-circle-exclamation.me-1
+            | Vencidas
+
       .table-responsive
         table.table.table-custom.mb-0
           thead
@@ -23,28 +131,138 @@ block content
               th Fecha Emisión
               th Monto
               th Estado
+              th Cambiar Estado
               th Acciones
-          tbody
-            //- Esqueleto de datos
-            tr
-              td.fw-bold.text-muted #INV-2026-0085
-              td Empresa ACME S.A.
-              td.small.text-muted 30/03/2026
-              td.fw-bold(style="color: var(--color-teal);") $487.20
-              td
-                span.badge.bg-success Pagada
-              td
-                a.btn.btn-sm.btn-outline-custom(href="/ventas/factura-view?id=85", title="Ver Factura en A4")
-                  i.fa-solid.fa-eye.me-1
-                  | PDF
-            tr
-              td.fw-bold.text-muted #INV-2026-0084
-              td Servicios Digitales LLC
-              td.small.text-muted 29/03/2026
-              td.fw-bold(style="color: var(--color-teal);") $1,250.00
-              td
-                span.badge.bg-warning.text-dark Pendiente
-              td
-                a.btn.btn-sm.btn-outline-custom(href="/ventas/factura-view?id=84", title="Ver Factura en A4")
-                  i.fa-solid.fa-eye.me-1
-                  | PDF
+          tbody#facturasBody
+            if facturas && facturas.length > 0
+              each factura in facturas
+                - var folio = String(factura.id).padStart(4, '0')
+                - var badgeClass = factura.estado === 'Pagada' ? 'bg-success' : (factura.estado === 'Vencida' ? 'bg-danger' : 'bg-warning text-dark')
+                tr(data-estado=factura.estado, data-id=factura.id)
+                  td.fw-bold.text-muted
+                    if factura.folio_fiscal
+                      | ##{factura.folio_fiscal.substring(0, 13)}...
+                    else
+                      | #INV-2026-#{folio}
+                  td= factura.cliente_nombre || 'Público General'
+                  td.small.text-muted= new Date(factura.fecha_emision).toLocaleDateString('es-MX')
+                  td.fw-bold(style="color: var(--color-teal);") $#{parseFloat(factura.total).toFixed(2)}
+                  td
+                    span.badge(class=badgeClass, id=`badge-${factura.id}`)= factura.estado
+                  td
+                    select.status-select(
+                      id=`select-${factura.id}`,
+                      data-id=factura.id,
+                      onchange=`cambiarEstado(${factura.id}, this.value)`
+                    )
+                      option(value="Pendiente", selected=(factura.estado === 'Pendiente')) ⏳ Pendiente
+                      option(value="Pagada", selected=(factura.estado === 'Pagada')) ✅ Pagada
+                      option(value="Vencida", selected=(factura.estado === 'Vencida')) ❌ Vencida
+                  td
+                    a.btn.btn-sm.btn-outline-custom(href=`/ventas/factura-view?id=${factura.id}`, title="Ver Factura en A4")
+                      i.fa-solid.fa-eye.me-1
+                      | PDF
+            else
+              tr
+                td(colspan="7").text-center.text-muted.p-4
+                  i.fa-solid.fa-inbox.me-2(style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;")
+                  | No hay facturas generadas aún.
+                  br
+                  small Registra una venta con la opción "Generar factura" activada.
+
+  //- Toast de confirmación
+  #statusToast.toast-status
+
+block scripts
+  script.
+    // ── Cambiar estado de factura via AJAX ──
+    function cambiarEstado(id, nuevoEstado) {
+      fetch('/ventas/facturas/cambiar-estado', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, estado: nuevoEstado })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          // Actualizar badge
+          var badge = document.getElementById('badge-' + id);
+          if (badge) {
+            badge.textContent = nuevoEstado;
+            badge.className = 'badge ';
+            if (nuevoEstado === 'Pagada') badge.className += 'bg-success';
+            else if (nuevoEstado === 'Vencida') badge.className += 'bg-danger';
+            else badge.className += 'bg-warning text-dark';
+          }
+
+          // Actualizar data-estado de la fila
+          var row = document.querySelector('tr[data-id="' + id + '"]');
+          if (row) row.setAttribute('data-estado', nuevoEstado);
+
+          // Actualizar contadores
+          actualizarContadores();
+
+          // Toast de confirmación
+          mostrarToast('✓ Estado actualizado a "' + nuevoEstado + '"', nuevoEstado);
+        } else {
+          mostrarToast('✗ Error: ' + (data.error || 'No se pudo actualizar'), 'error');
+          // Revertir select
+          var sel = document.getElementById('select-' + id);
+          if (sel && badge) sel.value = badge.textContent;
+        }
+      })
+      .catch(function(err) {
+        console.error(err);
+        mostrarToast('✗ Error de conexión', 'error');
+      });
+    }
+
+    // ── Filtrar facturas por estado ──
+    function filtrarFacturas(estado, btn) {
+      // Activar botón
+      document.querySelectorAll('.status-filter-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+
+      // Mostrar/ocultar filas
+      document.querySelectorAll('#facturasBody tr[data-estado]').forEach(function(row) {
+        if (estado === 'todas' || row.getAttribute('data-estado') === estado) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Actualizar contadores sin recargar ──
+    function actualizarContadores() {
+      var rows = document.querySelectorAll('#facturasBody tr[data-estado]');
+      var counts = { total: 0, Pendiente: 0, Pagada: 0, Vencida: 0 };
+      rows.forEach(function(row) {
+        counts.total++;
+        var est = row.getAttribute('data-estado');
+        if (counts[est] !== undefined) counts[est]++;
+      });
+      var elTotal = document.getElementById('countTotal');
+      var elPendiente = document.getElementById('countPendiente');
+      var elPagada = document.getElementById('countPagada');
+      var elVencida = document.getElementById('countVencida');
+      if (elTotal) elTotal.textContent = counts.total;
+      if (elPendiente) elPendiente.textContent = counts.Pendiente;
+      if (elPagada) elPagada.textContent = counts.Pagada;
+      if (elVencida) elVencida.textContent = counts.Vencida;
+    }
+
+    // ── Toast de confirmación ──
+    function mostrarToast(msg, tipo) {
+      var toast = document.getElementById('statusToast');
+      if (!toast) return;
+      toast.textContent = msg;
+      if (tipo === 'Pagada') toast.style.background = 'linear-gradient(135deg, #198754, #157347)';
+      else if (tipo === 'Vencida') toast.style.background = 'linear-gradient(135deg, #dc3545, #b02a37)';
+      else if (tipo === 'error') toast.style.background = 'linear-gradient(135deg, #dc3545, #b02a37)';
+      else toast.style.background = 'linear-gradient(135deg, #ffc107, #e0a800)';
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    }

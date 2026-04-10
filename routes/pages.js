@@ -328,6 +328,31 @@ router.get('/ventas/facturas', verificarSesion, verificarRol(['VENTAS']), (req, 
     });
 });
 
+// Cambiar estatus de factura (AJAX)
+router.post('/ventas/facturas/cambiar-estado', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const { id, estado } = req.body;
+    const estadosValidos = ['Pendiente', 'Pagada', 'Vencida'];
+
+    if (!id || !estadosValidos.includes(estado)) {
+        return res.status(400).json({ error: 'Datos no válidos' });
+    }
+
+    db.query(
+        "UPDATE ventas SET estado = ? WHERE id = ? AND tipo_comprobante = 'Factura'",
+        [estado, id],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Error actualizando estado' });
+            }
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'Factura no encontrada' });
+            }
+            res.json({ success: true, estado: estado });
+        }
+    );
+});
+
 router.get('/ventas/ticket', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     const { id } = req.query;
     if (!id) return res.redirect('/ventas/consultas');
@@ -513,7 +538,7 @@ router.post('/clientes/edit', verificarSesion, verificarRol(['VENTAS']), (req, r
 
 // AGREGAR VENTA (PRO)
 router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
-    const { cliente_id, producto_id, cantidad } = req.body;
+    const { cliente_id, producto_id, cantidad, generar_factura } = req.body;
 
     db.query("SELECT * FROM productos WHERE id = ?", [producto_id], (err, result) => {
         if (err || result.length === 0) return res.send("Producto no encontrado");
@@ -526,9 +551,21 @@ router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']), (req, res)
         const total = subtotal + iva;
         const empleado = req.session.usuario ? req.session.usuario.id : null;
 
+        // Determinar tipo de comprobante según checkbox de factura
+        const quiereFactura = generar_factura === 'si';
+        const tipoComprobante = quiereFactura ? 'Factura' : 'Ticket';
+        const estadoVenta = quiereFactura ? 'Pendiente' : 'Pagada';
+
+        // Generar folio fiscal si es factura (formato UUID simplificado)
+        let folioFiscal = null;
+        if (quiereFactura) {
+            const hex = () => Math.random().toString(16).substring(2, 6);
+            folioFiscal = `${hex()}${hex()}-${hex()}-${hex()}-${hex()}-${hex()}${hex()}${hex()}`.toUpperCase();
+        }
+
         db.query(
-            "INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total) VALUES (?, ?, ?, ?, ?)",
-            [cliente_id, empleado, subtotal, iva, total],
+            "INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, tipo_comprobante, estado, folio_fiscal) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [cliente_id, empleado, subtotal, iva, total, tipoComprobante, estadoVenta, folioFiscal],
             (err, ventaResult) => {
                 if (err) { console.log(err); return res.status(500).send("Error adding sale"); }
                 
@@ -550,6 +587,7 @@ router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']), (req, res)
         );
     });
 });
+
 
 // ================== COTIZACIONES ==================
 router.get('/cotizaciones/consultas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {

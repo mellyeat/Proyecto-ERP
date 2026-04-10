@@ -22,6 +22,7 @@ block content
               th Cliente
               th Producto
               th Monto
+              th Tipo
               th Fecha
               th Acciones
           tbody
@@ -32,15 +33,25 @@ block content
                   td.fw-bold= venta.cliente_nombre || 'Desconocido'
                   td= venta.producto_nombre || 'N/A'
                   td.fw-bold(style="color: var(--color-teal);") $#{venta.total}
+                  td
+                    if venta.tipo_comprobante === 'Factura'
+                      span.badge.bg-info.text-dark
+                        i.fa-solid.fa-file-invoice.me-1
+                        | Factura
+                    else
+                      span.badge.bg-secondary
+                        i.fa-solid.fa-receipt.me-1
+                        | Ticket
                   td.small.text-muted= new Date(venta.fecha_emision).toLocaleString()
                   td
                     .d-flex.gap-2
                       a.btn.btn-sm.btn-outline-custom(href=`/ventas/ticket?id=${venta.id}`, title="Ver Ticket (POS)")
                         i.fa-solid.fa-receipt.me-1
                         | Ticket
-                      a.btn.btn-sm.btn-outline-custom(href=`/ventas/factura-view?id=${venta.id}`, title="Ver Factura en PDF")
-                        i.fa-solid.fa-file-pdf.me-1
-                        | Factura
+                      if venta.tipo_comprobante === 'Factura'
+                        a.btn.btn-sm.btn-outline-custom(href=`/ventas/factura-view?id=${venta.id}`, title="Ver Factura en PDF")
+                          i.fa-solid.fa-file-pdf.me-1
+                          | Factura
             else
               tr
-                td(colspan="6").text-center.text-muted.p-4 No hay ventas registradas
+                td(colspan="7").text-center.text-muted.p-4 No hay ventas registradas

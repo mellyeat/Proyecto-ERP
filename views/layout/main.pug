@@ -12,11 +12,14 @@ html(lang="es")
     link(rel="stylesheet", href="/css/style.css")
 
   body
+    // Mobile Sidebar Overlay
+    #sidebarOverlay.sidebar-overlay
+
     .container-fluid.p-0
       .row.g-0
 
         // ================= SIDEBAR =================
-        .col-md-2.sidebar.d-flex.flex-column
+        .col-md-2.sidebar.d-flex.flex-column#mobileSidebar
           .sidebar-heading
             i.fa-solid.fa-chart-pie.me-2
             | Mini ERP
@@ -188,7 +191,10 @@ html(lang="es")
         .col-md-10.d-flex.flex-column.min-vh-100
 
           nav.navbar.navbar-expand-lg.top-navbar.d-flex.justify-content-between.align-items-center
-            span.navbar-brand.fs-5.text-muted Hola, Bienvenido
+            .d-flex.align-items-center
+              button#sidebarToggle.btn.btn-link.d-md-none.me-2(style="color: var(--color-dark-teal); font-size: 1.5rem;")
+                i.fa-solid.fa-bars
+              span.navbar-brand.fs-5.text-muted Hola, Bienvenido
 
             .d-flex.align-items-center.gap-3
               //- Notification Bell
@@ -224,8 +230,46 @@ html(lang="es")
           .p-4.flex-grow-1
             block content
 
+    // ================= BOTTOM NAV (MOBILE) =================
+    nav.bottom-nav.d-md-none
+      a.bottom-nav-item(href="/dashboard", class=(activePage === 'dashboard' ? 'active' : ''))
+        i.fa-solid.fa-gauge-high
+        span Inicio
+      if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'VENTAS')
+        a.bottom-nav-item(href="/ventas", class=(activePage === 'ventas' ? 'active' : ''))
+          i.fa-solid.fa-money-bill-wave
+          span Ventas
+      if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'COMPRAS')
+        a.bottom-nav-item(href="/productos/consultas", class=(activePage === 'productos' ? 'active' : ''))
+          i.fa-solid.fa-box-open
+          span Stock
+      if usuario && (usuario.rol === 'SUPER ADMIN' || usuario.rol === 'admin' || usuario.rol === 'Admin' || usuario.rol === 'VENTAS')
+        a.bottom-nav-item(href="/clientes/consultas", class=(activePage === 'clientes' ? 'active' : ''))
+          i.fa-solid.fa-users
+          span Clientes
+
     script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js")
     script.
+      // ── Off-Canvas Sidebar Toggle ──
+      (function() {
+        var toggleBtn = document.getElementById('sidebarToggle');
+        var sidebar = document.getElementById('mobileSidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+
+        if(toggleBtn && sidebar && overlay) {
+          toggleBtn.addEventListener('click', function() {
+            sidebar.classList.add('show');
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent bg scrolling
+          });
+          overlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+          });
+        }
+      })();
+
       // ── Global Chart Entrance Animation (IntersectionObserver) ──
       (function () {
         'use strict';
