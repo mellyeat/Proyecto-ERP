@@ -1,18 +1,31 @@
 const mysql = require('mysql2');
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'erp_db',
-    connectionLimit: 20,         // Máximo de conexiones simultáneas
-    waitForConnections: true,    // Esperar si todas están ocupadas
-    queueLimit: 0,               // Sin límite de cola de espera
-    connectTimeout: 10000,       // 10s para conectar
-    enableKeepAlive: true,       // Mantener conexiones vivas
-    keepAliveInitialDelay: 10000 // Ping cada 10s
-});
+// Soporte para MYSQL_URL (Railway) o variables individuales (local)
+const poolConfig = process.env.MYSQL_URL
+    ? {
+        uri: process.env.MYSQL_URL,
+        connectionLimit: 20,
+        waitForConnections: true,
+        queueLimit: 0,
+        connectTimeout: 10000,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000
+    }
+    : {
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 3306,
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'erp_db',
+        connectionLimit: 20,
+        waitForConnections: true,
+        queueLimit: 0,
+        connectTimeout: 10000,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000
+    };
+
+const pool = mysql.createPool(poolConfig);
 
 // Verificar que el pool funciona al inicio
 pool.getConnection((err, connection) => {
