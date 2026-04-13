@@ -126,54 +126,5 @@ block content
   //- Hidden data for chart
   script.
     window.__inventoryData = !{chartData};
-
-    function confirmarEliminarProd(prodId, prodNombre) {
-      document.getElementById('nombreProdEliminar').textContent = prodNombre;
-      document.getElementById('formEliminarProd').action = '/productos/delete/' + prodId;
-      var modal = new bootstrap.Modal(document.getElementById('modalEliminarProd'));
-      modal.show();
-    }
-
 block scripts
-  script(src="https://cdn.jsdelivr.net/npm/chart.js")
-  script.
-    document.addEventListener("DOMContentLoaded", function() {
-      var data = window.__inventoryData || [0, 0, 0];
-      const ctx = document.getElementById('inventoryChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Normal (≥10)', 'Bajo Stock (<10)', 'Agotado (0)'],
-          datasets: [{
-            data: data,
-            backgroundColor: [
-              '#198754',
-              '#ffc107',
-              '#dc3545'
-            ],
-            borderWidth: 0,
-            hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '70%',
-          animation: {
-            animateRotate: true,
-            animateScale: true,
-            duration: 1100,
-            easing: 'easeOutCirc'
-          },
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                usePointStyle: true,
-                padding: 15
-              }
-            }
-          }
-        }
-      });
-    });
+  script(src="https://cdn.jsdelivr.net/npm/chart.js")

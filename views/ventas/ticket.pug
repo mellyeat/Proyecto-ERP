@@ -6,40 +6,11 @@ block variables
 
 block content
   //- Estilos específicos para visualización y PDF
-  style.
-    .ticket-container {
-      background-color: #ffffff !important;
-      width: 350px;
-      margin: 20px auto;
-      padding: 20px;
-      font-family: 'Courier New', Courier, monospace;
-      color: #000;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      border: 1px solid #eee;
-    }
-    
-    /* Ajustes para que las tablas se vean bien en el PDF */
-    .ticket-container table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    
-    @media print {
-      .no-print { display: none !important; }
-      body { background: none; }
-      .ticket-container { 
-        box-shadow: none; 
-        border: none; 
-        margin: 0; 
-        width: 100%;
-      }
-    }
-
   //- Botones de acción (No se verán en el PDF)
   .d-flex.justify-content-between.align-items-center.mb-4.no-print
     h2.fw-bold(style="color: var(--color-dark-teal);") Visualizador de Ticket
     div
-      button.btn.btn-primary-custom.me-2(type="button", onclick="descargarPDF()")
+      button.btn.btn-primary-custom.me-2(type="button", onclick=`descargarPDF('Ticket_${venta.id}.pdf')`)
         i.fa-solid.fa-file-pdf.me-2
         | Descargar PDF
       button.btn.btn-outline-primary.me-2(type="button", onclick="window.print()")
@@ -104,41 +75,4 @@ block content
           p.small.text-muted.mt-2.mb-0 * Conservar ticket para cambios *
 
 block scripts
-  script(src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js")
-  script.
-    function descargarPDF() {
-      const element = document.getElementById('printableArea');
-      
-      const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     'Factura_#{folio}.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { 
-          scale: 3, 
-          useCORS: true, 
-          backgroundColor: '#ffffff',
-          scrollY: 0,
-          // ESTA ES LA MAGIA: Forzamos a que todo sea legible en la copia del PDF
-          onclone: (doc) => {
-            const pdfView = doc.getElementById('printableArea');
-            // Ponemos todo el texto en negro puro para que no se vea pálido
-            const allElements = pdfView.getElementsByTagName('*');
-            for (let el of allElements) {
-              // Si no es un badge, forzamos negro
-              if (!el.classList.contains('badge')) {
-                el.style.color = '#000000';
-                el.style.opacity = '1';
-              }
-            }
-            // Forzamos que las líneas de la tabla sean negras y visibles
-            const tables = pdfView.getElementsByTagName('table');
-            for (let table of tables) {
-              table.style.borderColor = '#000000';
-            }
-          }
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(element).save();
-    }
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js")

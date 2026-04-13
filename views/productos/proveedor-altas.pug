@@ -72,45 +72,4 @@ block content
           i.fa-solid.fa-truck-arrow-right.me-2
           | Confirmar Alta de Proveedor
 
-block scripts
-  script.
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.querySelector('form');
-      form.addEventListener('submit', function(e) {
-        const empresa = form.querySelector('[name="empresa"]');
-        const contacto = form.querySelector('[name="contacto"]');
-        const email = form.querySelector('[name="email"]');
-        const telefono = form.querySelector('[name="telefono"]');
-        const rfc = form.querySelector('[name="rfc"]');
-        let errors = [];
-
-        if (!empresa.value.trim()) errors.push('La razón social es obligatoria');
-        if (!contacto.value.trim()) errors.push('El nombre del contacto es obligatorio');
-
-        if (!email.value.trim()) {
-          errors.push('El correo electrónico es obligatorio');
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-          errors.push('El correo electrónico no tiene un formato válido');
-        }
-
-        if (telefono.value.trim()) {
-          const digits = telefono.value.replace(/\D/g, '');
-          if (digits.length < 7 || digits.length > 15) errors.push('El teléfono debe tener entre 7 y 15 dígitos');
-        }
-
-        if (rfc.value.trim() && !/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i.test(rfc.value.trim())) {
-          errors.push('El RFC no tiene un formato válido (ej: XAXX010101000)');
-        }
-
-        if (errors.length > 0) {
-          e.preventDefault();
-          let existingAlert = document.querySelector('.validation-alert');
-          if (existingAlert) existingAlert.remove();
-          const alertDiv = document.createElement('div');
-          alertDiv.className = 'validation-alert alert alert-danger';
-          alertDiv.innerHTML = '<strong>Errores:</strong><ul>' + errors.map(er => '<li>' + er + '</li>').join('') + '</ul>';
-          form.prepend(alertDiv);
-          window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-      });
-    });
+block scripts

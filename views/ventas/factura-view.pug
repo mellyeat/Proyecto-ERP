@@ -6,53 +6,13 @@ block variables
   - var folio = String(venta.id).padStart(4, '0')
 
 block content
-  style.
-    .a4-container {
-      background: #fff;
-      margin: 0 auto;
-      padding: 40px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      border-radius: 8px;
-    }
-    .company-header {
-      border-bottom: 2px solid #000;
-      padding-bottom: 15px;
-      margin-bottom: 30px;
-    }
-    .brand-title {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #2c3e50;
-    }
-    .invoice-details p {
-      margin: 0;
-      font-size: 0.9rem;
-    }
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #printableArea, #printableArea * {
-        visibility: visible;
-      }
-      #printableArea {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        box-shadow: none;
-        padding: 0;
-      }
-      .a4-container { margin: 0; }
-    }
-
   .d-flex.justify-content-between.align-items-center.mb-4
     h2.fw-bold(style="color: var(--color-dark-teal);") Visualizador de Factura
     div
       button.btn.btn-outline-custom.me-2(type="button")
         i.fa-solid.fa-envelope.me-2
         | Enviar por Correo
-      button.btn.btn-primary-custom.me-2(type="button", onclick="descargarPDF()")
+      button.btn.btn-primary-custom.me-2(type="button", onclick=`descargarPDF('Factura_${folio}.pdf')`)
         i.fa-solid.fa-file-pdf.me-2
         | Descargar PDF
       a.btn.btn-secondary(href="/ventas/consultas")
@@ -138,16 +98,4 @@ block content
             p.text-muted.small.mt-2.mb-0 Atendido por: #{venta.cajero_nombre}
 
 block scripts
-  script(src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js")
-  script.
-    function descargarPDF() {
-      const element = document.getElementById('printableArea');
-      const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     'Factura.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js")

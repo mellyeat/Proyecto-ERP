@@ -10,6 +10,7 @@ html(lang="es")
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css")
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
     link(rel="stylesheet", href="/css/style.css")
+    link(rel="stylesheet", href="/css/views.css")
 
   body
     // Mobile Sidebar Overlay
@@ -249,120 +250,5 @@ html(lang="es")
           span Clientes
 
     script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js")
-    script.
-      // ── Off-Canvas Sidebar Toggle ──
-      (function() {
-        var toggleBtn = document.getElementById('sidebarToggle');
-        var sidebar = document.getElementById('mobileSidebar');
-        var overlay = document.getElementById('sidebarOverlay');
-
-        if(toggleBtn && sidebar && overlay) {
-          toggleBtn.addEventListener('click', function() {
-            sidebar.classList.add('show');
-            overlay.classList.add('show');
-            document.body.style.overflow = 'hidden'; // Prevent bg scrolling
-          });
-          overlay.addEventListener('click', function() {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-            document.body.style.overflow = '';
-          });
-        }
-      })();
-
-      // ── Global Chart Entrance Animation (IntersectionObserver) ──
-      (function () {
-        'use strict';
-        var observer = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('chart-visible');
-              observer.unobserve(entry.target); // fire only once
-            }
-          });
-        }, { threshold: 0.15 });
-
-        // Run after all content (incl. child scripts) has loaded
-        window.addEventListener('load', function () {
-          document.querySelectorAll('.chart-wrapper').forEach(function (el) {
-            observer.observe(el);
-          });
-        });
-
-        // Staggered animation for metric cards
-        window.addEventListener('DOMContentLoaded', function () {
-          document.querySelectorAll('.card-custom').forEach(function (card, i) {
-            card.style.animationDelay = (i * 0.07) + 's';
-          });
-        });
-      })();
-    script.
-      // ── Notification Bell: Low Stock Alerts ──
-      (function () {
-        'use strict';
-        var bell    = document.getElementById('notifBell');
-        var panel   = document.getElementById('notifPanel');
-        var badge   = document.getElementById('notifBadge');
-        var list    = document.getElementById('notifList');
-        var count   = document.getElementById('notifCount');
-        if (!bell) return;
-
-        // Toggle panel
-        bell.addEventListener('click', function (e) {
-          e.stopPropagation();
-          panel.classList.toggle('open');
-          // Remove "new" pulse when opening
-          if (panel.classList.contains('open')) {
-            bell.classList.remove('notif-pulse');
-          }
-        });
-
-        // Close when clicking outside
-        document.addEventListener('click', function (e) {
-          if (!panel.contains(e.target) && e.target !== bell) {
-            panel.classList.remove('open');
-          }
-        });
-
-        // Fetch low-stock data
-        function loadAlerts() {
-          fetch('/api/low-stock')
-            .then(function(r) { return r.json(); })
-            .then(function(items) {
-              if (!items || items.length === 0) {
-                badge.classList.add('d-none');
-                count.textContent = '0 alertas';
-                list.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-check-circle me-2 text-success"></i>Todo en orden — no hay alertas</div>';
-                return;
-              }
-
-              badge.textContent = items.length;
-              badge.classList.remove('d-none');
-              count.textContent = items.length + (items.length === 1 ? ' alerta' : ' alertas');
-              bell.classList.add('notif-pulse');
-
-              var html = '';
-              items.forEach(function (p) {
-                var level = p.stock <= 2 ? 'critical' : p.stock <= 5 ? 'warning' : 'low';
-                var icon  = level === 'critical' ? 'fa-circle-xmark text-danger'
-                          : level === 'warning'  ? 'fa-triangle-exclamation text-warning'
-                          :                        'fa-circle-info text-info';
-                html += '<a href="/productos/cambios?id=' + p.id + '" class="notif-item notif-' + level + '">'
-                     +    '<div class="notif-item-icon"><i class="fa-solid ' + icon + '"></i></div>'
-                     +    '<div class="notif-item-body">'
-                     +      '<div class="notif-item-title">' + p.nombre + '</div>'
-                     +      '<div class="notif-item-detail">Quedan <strong>' + p.stock + '</strong> unidades</div>'
-                     +    '</div>'
-                     +    '<div class="notif-item-stock">' + p.stock + '</div>'
-                     +  '</a>';
-              });
-              list.innerHTML = html;
-            })
-            .catch(function(err) { console.error('Notif error:', err); });
-        }
-
-        // Initial load + refresh every 60s
-        loadAlerts();
-        setInterval(loadAlerts, 60000);
-      })();
+    script(src="/js/views.js")
     block scripts

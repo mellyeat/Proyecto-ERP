@@ -80,19 +80,4 @@ block content
           i.fa-solid.fa-pencil.me-2
           | Guardar Cambios
 
-block scripts
-  script.
-    document.addEventListener("DOMContentLoaded", function() {
-      const toggleFactura = document.getElementById('requiereFactura');
-      const seccionFacturacion = document.getElementById('seccionFacturacion');
-      
-      toggleFactura.addEventListener('change', function() {
-        if(this.checked) {
-          seccionFacturacion.style.opacity = '1';
-          seccionFacturacion.style.pointerEvents = 'auto';
-        } else {
-          seccionFacturacion.style.opacity = '0.3';
-          seccionFacturacion.style.pointerEvents = 'none';
-        }
-      });
-    });
+block scripts

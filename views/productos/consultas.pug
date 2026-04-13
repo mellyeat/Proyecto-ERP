@@ -69,11 +69,4 @@ block content
               i.fa-solid.fa-trash.me-2
               | Sí, Eliminar
 
-block scripts
-  script.
-    function confirmarEliminarProd(prodId, prodNombre) {
-      document.getElementById('nombreProdEliminar').textContent = prodNombre;
-      document.getElementById('formEliminarProd').action = '/productos/delete/' + prodId;
-      var modal = new bootstrap.Modal(document.getElementById('modalEliminarProd'));
-      modal.show();
-    }
+block scripts
