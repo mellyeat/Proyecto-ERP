@@ -6,6 +6,9 @@ const PORT = process.env.PORT || 3000;
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
 
+// Necesario para que express-rate-limit funcione detrás de proxies (como Railway o Nginx)
+app.set('trust proxy', 1);
+
 // ─── Rate Limiting ──────────────────────────────────────────────────
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,  // 1 minuto
