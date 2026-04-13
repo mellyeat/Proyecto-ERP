@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../config/db');
 const verificarSesion = require('../middleware/auth');
 const verificarRol = require('../middleware/roles');
+const { validateBody, validateParamId, validateQueryId, sanitize, ROLES_VALIDOS, ESTADOS_FACTURA } = require('../middleware/validators');
 
 
 router.get('/', (req, res) => {
@@ -18,7 +19,12 @@ router.get('/login', (req, res) => {
 });
 
 // VALIDAR LOGIN
-router.post('/login', (req, res) => {
+router.post('/login',
+    validateBody({
+        usuario:  { required: true, label: 'Usuario' },
+        password: { required: true, label: 'Contraseña' }
+    }),
+    (req, res) => {
 
     const { usuario, password } = req.body;
 
@@ -101,7 +107,15 @@ router.get('/empleados/altas', verificarSesion, verificarRol(['RH']), (req, res)
     res.render('empleados/altas');
 });
 
-router.post('/empleados/add', verificarSesion, verificarRol(['RH']), (req, res) => {
+router.post('/empleados/add', verificarSesion, verificarRol(['RH']),
+    validateBody({
+        nombre_completo: { required: true, label: 'Nombre completo' },
+        usuario:         { required: true, minLength: 3, label: 'Usuario' },
+        password:        { required: true, minLength: 4, label: 'Contraseña' },
+        rol:             { required: true, oneOf: ROLES_VALIDOS, label: 'Rol' },
+        salario:         { nonNegative: true, label: 'Salario' }
+    }),
+    (req, res) => {
     const { nombre_completo, usuario, password, puesto, rol, salario } = req.body;
     db.query(
         "INSERT INTO empleados_usuarios (nombre_completo, usuario, password, puesto, rol, salario) VALUES (?, ?, ?, ?, ?, ?)",
@@ -124,7 +138,15 @@ router.get('/empleados/cambios', verificarSesion, verificarRol(['RH']), (req, re
     });
 });
 
-router.post('/empleados/edit', verificarSesion, verificarRol(['RH']), (req, res) => {
+router.post('/empleados/edit', verificarSesion, verificarRol(['RH']),
+    validateBody({
+        id:              { required: true, validId: true, label: 'ID del empleado' },
+        nombre_completo: { required: true, label: 'Nombre completo' },
+        usuario:         { required: true, minLength: 3, label: 'Usuario' },
+        rol:             { required: true, oneOf: ROLES_VALIDOS, label: 'Rol' },
+        salario:         { nonNegative: true, label: 'Salario' }
+    }),
+    (req, res) => {
     const { id, nombre_completo, usuario, puesto, rol, salario, activo } = req.body;
     const activoVal = activo === 'on' ? 1 : 0;
     db.query(
@@ -174,7 +196,13 @@ router.get('/productos/altas', verificarSesion, verificarRol(['COMPRAS']), (req,
 });
 
 router.get('/productos/proveedores', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
-    db.query("SELECT id, razon_social, rfc, categoria, contacto_nombre, telefono, email FROM proveedores", (err, results) => {
+    db.query(`
+        SELECT p.id, p.razon_social, p.rfc, p.categoria, p.contacto_nombre, p.telefono, p.email,
+               COUNT(pr.id) AS total_productos
+        FROM proveedores p
+        LEFT JOIN productos pr ON pr.proveedor_id = p.id
+        GROUP BY p.id
+    `, (err, results) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Error fetching proveedores");
@@ -187,7 +215,15 @@ router.get('/productos/proveedor-altas', verificarSesion, verificarRol(['COMPRAS
     res.render('productos/proveedor-altas');
 });
 
-router.post('/productos/proveedor-add', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
+router.post('/productos/proveedor-add', verificarSesion, verificarRol(['COMPRAS']),
+    validateBody({
+        empresa:  { required: true, label: 'Razón Social' },
+        contacto: { required: true, label: 'Nombre del Contacto' },
+        email:    { required: true, email: true, label: 'Correo Electrónico' },
+        rfc:      { rfc: true, label: 'RFC' },
+        telefono: { phone: true, label: 'Teléfono' }
+    }),
+    (req, res) => {
     const { empresa, rfc, categoria, contacto, telefono, email } = req.body;
     db.query(
         "INSERT INTO proveedores (razon_social, rfc, categoria, contacto_nombre, telefono, email) VALUES (?, ?, ?, ?, ?, ?)",
@@ -200,6 +236,70 @@ router.post('/productos/proveedor-add', verificarSesion, verificarRol(['COMPRAS'
             res.redirect('/productos/proveedores');
         }
     );
+});
+
+// Editar proveedor - mostrar formulario
+router.get('/productos/proveedor-cambios', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
+    const id = req.query.id;
+    if (!id) return res.redirect('/productos/proveedores');
+    db.query("SELECT * FROM proveedores WHERE id = ?", [id], (err, results) => {
+        if (err || results.length === 0) return res.redirect('/productos/proveedores');
+        res.render('productos/proveedor-cambios', { proveedor: results[0] });
+    });
+});
+
+// Editar proveedor - guardar cambios
+router.post('/productos/proveedor-edit', verificarSesion, verificarRol(['COMPRAS']),
+    validateBody({
+        id:       { required: true, validId: true, label: 'ID del proveedor' },
+        empresa:  { required: true, label: 'Razón Social' },
+        contacto: { required: true, label: 'Nombre del Contacto' },
+        email:    { required: true, email: true, label: 'Correo Electrónico' },
+        rfc:      { rfc: true, label: 'RFC' },
+        telefono: { phone: true, label: 'Teléfono' }
+    }),
+    (req, res) => {
+    const { id, empresa, rfc, categoria, contacto, telefono, email } = req.body;
+    db.query(
+        "UPDATE proveedores SET razon_social=?, rfc=?, categoria=?, contacto_nombre=?, telefono=?, email=? WHERE id=?",
+        [empresa, rfc, categoria, contacto, telefono, email, id],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error actualizando proveedor");
+            }
+            res.redirect('/productos/proveedores');
+        }
+    );
+});
+
+// Eliminar proveedor
+router.post('/productos/proveedor-delete/:id', verificarSesion, verificarRol(['COMPRAS']), validateParamId('id'), (req, res) => {
+    const id = req.params.id;
+    // Primero desvinculamos los productos que tengan este proveedor
+    db.query("UPDATE productos SET proveedor_id = NULL WHERE proveedor_id = ?", [id], (err) => {
+        if (err) console.log(err);
+        db.query("DELETE FROM proveedores WHERE id = ?", [id], (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error eliminando proveedor");
+            }
+            res.redirect('/productos/proveedores');
+        });
+    });
+});
+
+// API: Productos de un proveedor (para modal AJAX)
+router.get('/api/proveedor-productos', verificarSesion, (req, res) => {
+    const id = req.query.id;
+    if (!id) return res.json([]);
+    db.query("SELECT id, nombre, stock, precio FROM productos WHERE proveedor_id = ?", [id], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error fetching products" });
+        }
+        res.json(results || []);
+    });
 });
 
 router.get('/productos/cambios', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
@@ -216,7 +316,15 @@ router.get('/productos/cambios', verificarSesion, verificarRol(['COMPRAS']), (re
     });
 });
 
-router.post('/productos/edit', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
+router.post('/productos/edit', verificarSesion, verificarRol(['COMPRAS']),
+    validateBody({
+        id:       { required: true, validId: true, label: 'ID del producto' },
+        nombre:   { required: true, label: 'Nombre del producto' },
+        proveedor:{ required: true, validId: true, label: 'Proveedor' },
+        stock:    { required: true, nonNegativeInt: true, label: 'Stock' },
+        precio:   { required: true, positive: true, label: 'Precio' }
+    }),
+    (req, res) => {
     const { id, nombre, proveedor, stock, precio } = req.body;
     db.query(
         "UPDATE productos SET nombre=?, proveedor_id=?, stock=?, precio=? WHERE id=?",
@@ -231,7 +339,14 @@ router.post('/productos/edit', verificarSesion, verificarRol(['COMPRAS']), (req,
     );
 });
 
-router.post('/productos/add', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
+router.post('/productos/add', verificarSesion, verificarRol(['COMPRAS']),
+    validateBody({
+        nombre:   { required: true, label: 'Nombre del producto' },
+        proveedor:{ required: true, validId: true, label: 'Proveedor' },
+        stock:    { required: true, nonNegativeInt: true, label: 'Stock' },
+        precio:   { required: true, positive: true, label: 'Precio' }
+    }),
+    (req, res) => {
     const { nombre, proveedor, stock, precio } = req.body;
     db.query(
         "INSERT INTO productos (nombre, proveedor_id, stock, precio) VALUES (?, ?, ?, ?)",
@@ -244,6 +359,26 @@ router.post('/productos/add', verificarSesion, verificarRol(['COMPRAS']), (req, 
             res.redirect('/productos/consultas');
         }
     );
+});
+
+// Eliminar producto
+router.post('/productos/delete/:id', verificarSesion, verificarRol(['COMPRAS']), validateParamId('id'), (req, res) => {
+    const id = req.params.id;
+    const referer = req.get('Referer') || '/productos/consultas';
+    // Desvinculamos de venta_detalle para no romper integridad referencial
+    db.query("UPDATE venta_detalle SET producto_id = NULL WHERE producto_id = ?", [id], (err) => {
+        if (err) console.log(err);
+        db.query("UPDATE cotizacion_detalle SET producto_id = NULL WHERE producto_id = ?", [id], (err) => {
+            if (err) console.log(err);
+            db.query("DELETE FROM productos WHERE id = ?", [id], (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send("Error eliminando producto");
+                }
+                res.redirect(referer);
+            });
+        });
+    });
 });
 
 router.get('/ventas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
@@ -329,13 +464,13 @@ router.get('/ventas/facturas', verificarSesion, verificarRol(['VENTAS']), (req, 
 });
 
 // Cambiar estatus de factura (AJAX)
-router.post('/ventas/facturas/cambiar-estado', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+router.post('/ventas/facturas/cambiar-estado', verificarSesion, verificarRol(['VENTAS']),
+    validateBody({
+        id:     { required: true, validId: true, label: 'ID de factura' },
+        estado: { required: true, oneOf: ESTADOS_FACTURA, label: 'Estado' }
+    }),
+    (req, res) => {
     const { id, estado } = req.body;
-    const estadosValidos = ['Pendiente', 'Pagada', 'Vencida'];
-
-    if (!id || !estadosValidos.includes(estado)) {
-        return res.status(400).json({ error: 'Datos no válidos' });
-    }
 
     db.query(
         "UPDATE ventas SET estado = ? WHERE id = ? AND tipo_comprobante = 'Factura'",
@@ -482,7 +617,15 @@ router.get('/clientes/altas', verificarSesion, verificarRol(['VENTAS']), (req, r
     res.render('clientes/altas');
 });
 
-router.post('/clientes/add', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+router.post('/clientes/add', verificarSesion, verificarRol(['VENTAS']),
+    validateBody({
+        nombre:   { required: true, label: 'Nombre Comercial' },
+        email:    { required: true, email: true, label: 'Correo Electrónico' },
+        telefono: { phone: true, label: 'Teléfono' },
+        rfc:      { rfc: true, label: 'RFC' },
+        cp:       { cp: true, label: 'Código Postal' }
+    }),
+    (req, res) => {
     const { nombre, contacto, telefono, email, requiere_factura, razon_social, rfc, direccion, cp, regimen } = req.body;
     let reqFactura = requiere_factura === 'on' ? 1 : 0;
     
@@ -519,7 +662,16 @@ router.get('/clientes/cambios', verificarSesion, verificarRol(['VENTAS']), (req,
     });
 });
 
-router.post('/clientes/edit', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+router.post('/clientes/edit', verificarSesion, verificarRol(['VENTAS']),
+    validateBody({
+        id:       { required: true, validId: true, label: 'ID del cliente' },
+        nombre:   { required: true, label: 'Nombre Comercial' },
+        email:    { required: true, email: true, label: 'Correo Electrónico' },
+        telefono: { phone: true, label: 'Teléfono' },
+        rfc:      { rfc: true, label: 'RFC' },
+        cp:       { cp: true, label: 'Código Postal' }
+    }),
+    (req, res) => {
     const { id, nombre, contacto, telefono, email, requiere_factura, razon_social, rfc, direccion, cp, regimen } = req.body;
     let reqFactura = requiere_factura === 'on' ? 1 : 0;
 
@@ -537,7 +689,13 @@ router.post('/clientes/edit', verificarSesion, verificarRol(['VENTAS']), (req, r
 });
 
 // AGREGAR VENTA (PRO)
-router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']),
+    validateBody({
+        cliente_id:  { required: true, validId: true, label: 'Cliente' },
+        producto_id: { required: true, validId: true, label: 'Producto' },
+        cantidad:    { required: true, positiveInt: true, label: 'Cantidad' }
+    }),
+    (req, res) => {
     const { cliente_id, producto_id, cantidad, generar_factura } = req.body;
 
     db.query("SELECT * FROM productos WHERE id = ?", [producto_id], (err, result) => {
@@ -615,7 +773,14 @@ router.get('/cotizaciones/altas', verificarSesion, verificarRol(['VENTAS']), (re
     });
 });
 
-router.post('/cotizaciones/add', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+router.post('/cotizaciones/add', verificarSesion, verificarRol(['VENTAS']),
+    validateBody({
+        cliente_id:   { required: true, validId: true, label: 'Cliente' },
+        producto_id:  { required: true, validId: true, label: 'Producto' },
+        cantidad:     { required: true, positiveInt: true, label: 'Cantidad' },
+        vigencia_dias:{ required: true, positiveInt: true, label: 'Vigencia (días)' }
+    }),
+    (req, res) => {
     const { cliente_id, producto_id, cantidad, vigencia_dias } = req.body;
 
     db.query("SELECT * FROM productos WHERE id = ?", [producto_id], (err, result) => {

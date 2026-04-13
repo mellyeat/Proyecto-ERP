@@ -35,3 +35,31 @@ block content
                 label.form-label.text-muted.small Precio Unitario ($)
                 input.form-control.bg-light(type="number", step="0.01", name="precio", placeholder="Ej: 25.50", required)
               button.btn.btn-primary-custom.w-100(type="submit") Añadir Producto
+
+block scripts
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e) {
+        const nombre = form.querySelector('[name="nombre"]');
+        const proveedor = form.querySelector('[name="proveedor"]');
+        const stock = form.querySelector('[name="stock"]');
+        const precio = form.querySelector('[name="precio"]');
+        let errors = [];
+
+        if (!nombre.value.trim()) errors.push('El nombre del producto es obligatorio');
+        if (!proveedor.value) errors.push('Debes seleccionar un proveedor');
+        if (stock.value === '' || Number(stock.value) < 0 || !Number.isInteger(Number(stock.value))) errors.push('El stock debe ser un número entero mayor o igual a 0');
+        if (precio.value === '' || Number(precio.value) <= 0) errors.push('El precio debe ser mayor a 0');
+
+        if (errors.length > 0) {
+          e.preventDefault();
+          let existingAlert = document.querySelector('.validation-alert');
+          if (existingAlert) existingAlert.remove();
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'validation-alert alert alert-danger';
+          alertDiv.innerHTML = '<strong>Errores:</strong><ul>' + errors.map(er => '<li>' + er + '</li>').join('') + '</ul>';
+          form.parentElement.prepend(alertDiv);
+        }
+      });
+    });

@@ -1,18 +1,31 @@
 const mysql = require('mysql2');
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'erp_db'
+    database: process.env.DB_NAME || 'erp_db',
+    connectionLimit: 20,         // Máximo de conexiones simultáneas
+    waitForConnections: true,    // Esperar si todas están ocupadas
+    queueLimit: 0,               // Sin límite de cola de espera
+    connectTimeout: 10000,       // 10s para conectar
+    enableKeepAlive: true,       // Mantener conexiones vivas
+    keepAliveInitialDelay: 10000 // Ping cada 10s
 });
 
-connection.connect(err => {
+// Verificar que el pool funciona al inicio
+pool.getConnection((err, connection) => {
     if (err) {
-        console.error('Error de conexión:', err);
+        console.error('Error de conexión al pool MySQL:', err.message);
     } else {
-        console.log('Conectado a la base de datos MySQL');
+        console.log('Pool MySQL conectado correctamente (' + pool.config.connectionLimit + ' conexiones máx)');
+        connection.release();
     }
 });
 
-module.exports = connection;
+// Manejar errores del pool de forma global
+pool.on('error', (err) => {
+    console.error('Error inesperado en pool MySQL:', err.message);
+});
+
+module.exports = pool;

@@ -20,8 +20,8 @@ block content
               i.fa-solid.fa-truck-fast.me-2
               | Proveedores Registrados
             .input-group(style="width: 250px;")
-              input.form-control.form-control-sm(type="text", placeholder="Buscar proveedor...")
-              button.btn.btn-outline-secondary.btn-sm
+              input#searchProveedor.form-control.form-control-sm(type="text", placeholder="Buscar proveedor...")
+              button.btn.btn-outline-secondary.btn-sm(onclick="filtrarProveedores()")
                 i.fa-solid.fa-search
                 
           .table-responsive
@@ -34,10 +34,10 @@ block content
                   th Artículos Surtidos
                   th Estado
                   th Acciones
-              tbody
+              tbody#tablaProveedores
                 if proveedores && proveedores.length > 0
                   each prov in proveedores
-                    tr
+                    tr.fila-proveedor
                       td.text-muted #PRV-#{prov.id}
                       td
                         .fw-bold= prov.razon_social
@@ -50,15 +50,134 @@ block content
                           i.fa-solid.fa-envelope.me-1.text-muted
                           | #{prov.email}
                       td.text-center
-                        span.badge.bg-light.text-dark.border 0 productos
+                        span.badge.bg-light.text-dark.border= (prov.total_productos || 0) + ' productos'
                       td
                         span.badge.bg-success Activo
                       td
                         .d-flex.gap-2
-                          button.btn.btn-sm.btn-warning(title="Editar Proveedor", disabled)
+                          a.btn.btn-sm.btn-warning(href=`/productos/proveedor-cambios?id=${prov.id}`, title="Editar Proveedor")
                             i.fa-solid.fa-pencil
-                          button.btn.btn-sm.btn-outline-custom(title="Ver Productos Surtidos", disabled)
+                          button.btn.btn-sm.btn-outline-custom(
+                            title="Ver Productos Surtidos",
+                            onclick=`verProductos(${prov.id}, '${prov.razon_social}')`
+                          )
                             i.fa-solid.fa-box-open
+                          button.btn.btn-sm.btn-danger(
+                            title="Eliminar Proveedor",
+                            onclick=`confirmarEliminar(${prov.id}, '${prov.razon_social}')`
+                          )
+                            i.fa-solid.fa-trash
                 else
                   tr
                     td(colspan="6").text-center.text-muted No hay proveedores registrados
+
+  //- Modal: Ver Productos del Proveedor
+  .modal.fade#modalProductos(tabindex="-1", aria-labelledby="modalProductosLabel", aria-hidden="true")
+    .modal-dialog.modal-lg.modal-dialog-centered
+      .modal-content(style="border: none; border-radius: 16px; overflow: hidden;")
+        .modal-header(style="background: linear-gradient(135deg, var(--color-dark-teal), var(--color-teal)); border: none;")
+          h5.modal-title.text-white#modalProductosLabel
+            i.fa-solid.fa-box-open.me-2
+            | Productos del Proveedor
+          button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Cerrar")
+        .modal-body.p-0#modalProductosBody
+          .text-center.p-4
+            .spinner-border.text-muted(role="status")
+            p.text-muted.mt-2 Cargando productos...
+        .modal-footer(style="border-top: 1px solid #eee;")
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cerrar
+
+  //- Modal: Confirmar Eliminación
+  .modal.fade#modalEliminar(tabindex="-1", aria-labelledby="modalEliminarLabel", aria-hidden="true")
+    .modal-dialog.modal-dialog-centered
+      .modal-content(style="border: none; border-radius: 16px; overflow: hidden;")
+        .modal-header.bg-danger.text-white(style="border: none;")
+          h5.modal-title#modalEliminarLabel
+            i.fa-solid.fa-triangle-exclamation.me-2
+            | Confirmar Eliminación
+          button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Cerrar")
+        .modal-body.p-4
+          p.mb-1 ¿Estás seguro de que deseas eliminar al proveedor:
+          p.fw-bold.fs-5#nombreProvEliminar
+          .alert.alert-warning.mt-3.mb-0
+            i.fa-solid.fa-info-circle.me-2
+            | Los productos asociados a este proveedor quedarán sin proveedor asignado.
+        .modal-footer(style="border-top: 1px solid #eee;")
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cancelar
+          form#formEliminar(method="POST", style="margin: 0;")
+            button.btn.btn-danger(type="submit")
+              i.fa-solid.fa-trash.me-2
+              | Sí, Eliminar
+
+block scripts
+  script.
+    // ── Búsqueda en tiempo real ──
+    var searchInput = document.getElementById('searchProveedor');
+    if (searchInput) {
+      searchInput.addEventListener('input', filtrarProveedores);
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); filtrarProveedores(); }
+      });
+    }
+
+    function filtrarProveedores() {
+      var termino = document.getElementById('searchProveedor').value.toLowerCase().trim();
+      var filas = document.querySelectorAll('.fila-proveedor');
+      var hayResultados = false;
+
+      filas.forEach(function(fila) {
+        var texto = fila.textContent.toLowerCase();
+        if (texto.indexOf(termino) !== -1) {
+          fila.style.display = '';
+          hayResultados = true;
+        } else {
+          fila.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Ver Productos del Proveedor (AJAX) ──
+    function verProductos(provId, provNombre) {
+      var modal = new bootstrap.Modal(document.getElementById('modalProductos'));
+      document.getElementById('modalProductosLabel').innerHTML = '<i class="fa-solid fa-box-open me-2"></i>Productos de: ' + provNombre;
+      document.getElementById('modalProductosBody').innerHTML = '<div class="text-center p-4"><div class="spinner-border text-muted" role="status"></div><p class="text-muted mt-2">Cargando productos...</p></div>';
+      modal.show();
+
+      fetch('/api/proveedor-productos?id=' + provId)
+        .then(function(r) { return r.json(); })
+        .then(function(productos) {
+          var body = document.getElementById('modalProductosBody');
+          if (!productos || productos.length === 0) {
+            body.innerHTML = '<div class="text-center p-5"><i class="fa-solid fa-box-open fa-3x text-muted mb-3" style="opacity:0.3;"></i><p class="text-muted mb-0">Este proveedor aún no tiene productos registrados.</p><a href="/productos/altas" class="btn btn-primary-custom btn-sm mt-3"><i class="fa-solid fa-plus me-1"></i>Agregar Producto</a></div>';
+            return;
+          }
+
+          var html = '<div class="table-responsive"><table class="table table-custom mb-0 align-middle">';
+          html += '<thead><tr><th>ID</th><th>Producto</th><th>Stock</th><th>Precio</th><th>Acción</th></tr></thead><tbody>';
+          productos.forEach(function(p) {
+            var stockClass = p.stock < 10 ? 'bg-danger' : 'bg-success';
+            var stockLabel = p.stock < 10 ? p.stock + ' (Bajo)' : p.stock;
+            html += '<tr>';
+            html += '<td class="text-muted">#' + p.id + '</td>';
+            html += '<td class="fw-bold">' + p.nombre + '</td>';
+            html += '<td><span class="badge ' + stockClass + '">' + stockLabel + '</span></td>';
+            html += '<td class="fw-bold" style="color: var(--color-teal);">$' + Number(p.precio).toFixed(2) + '</td>';
+            html += '<td><a class="btn btn-sm btn-warning" href="/productos/cambios?id=' + p.id + '" title="Editar"><i class="fa-solid fa-pencil"></i></a></td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table></div>';
+          body.innerHTML = html;
+        })
+        .catch(function(err) {
+          console.error(err);
+          document.getElementById('modalProductosBody').innerHTML = '<div class="text-center p-4 text-danger"><i class="fa-solid fa-circle-xmark fa-2x mb-2"></i><p>Error al cargar productos</p></div>';
+        });
+    }
+
+    // ── Confirmar Eliminación ──
+    function confirmarEliminar(provId, provNombre) {
+      document.getElementById('nombreProvEliminar').textContent = provNombre;
+      document.getElementById('formEliminar').action = '/productos/proveedor-delete/' + provId;
+      var modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+      modal.show();
+    }

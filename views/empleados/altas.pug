@@ -59,3 +59,34 @@ block content
         button.btn.btn-primary-custom.px-5.py-2(type="submit")
           i.fa-solid.fa-save.me-2
           | Guardar Empleado
+
+block scripts
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e) {
+        const nombre = form.querySelector('[name="nombre_completo"]');
+        const usuario = form.querySelector('[name="usuario"]');
+        const password = form.querySelector('[name="password"]');
+        const salario = form.querySelector('[name="salario"]');
+        const rol = form.querySelector('[name="rol"]');
+        let errors = [];
+
+        if (!nombre.value.trim()) errors.push('El nombre completo es obligatorio');
+        if (usuario.value.trim().length < 3) errors.push('El usuario debe tener al menos 3 caracteres');
+        if (password.value.length < 4) errors.push('La contraseña debe tener al menos 4 caracteres');
+        if (!rol.value) errors.push('Debes seleccionar un rol');
+        if (salario.value && Number(salario.value) < 0) errors.push('El salario no puede ser negativo');
+
+        if (errors.length > 0) {
+          e.preventDefault();
+          let existingAlert = document.querySelector('.validation-alert');
+          if (existingAlert) existingAlert.remove();
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'validation-alert alert alert-danger';
+          alertDiv.innerHTML = '<strong>Errores:</strong><ul>' + errors.map(er => '<li>' + er + '</li>').join('') + '</ul>';
+          form.prepend(alertDiv);
+          window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+      });
+    });

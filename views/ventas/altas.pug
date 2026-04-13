@@ -106,4 +106,30 @@ block scripts
 
       if(selectProducto) selectProducto.addEventListener('change', actualizarTotal);
       if(inputCantidad) inputCantidad.addEventListener('input', actualizarTotal);
+
+      // Validación del formulario
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e) {
+        const clienteId = form.querySelector('[name="cliente_id"]');
+        const productoId = form.querySelector('[name="producto_id"]');
+        const cantidad = form.querySelector('[name="cantidad"]');
+        let errors = [];
+
+        if (!clienteId.value) errors.push('Debes seleccionar un cliente');
+        if (!productoId.value) errors.push('Debes seleccionar un producto');
+        if (cantidad.value === '' || Number(cantidad.value) < 1 || !Number.isInteger(Number(cantidad.value))) {
+          errors.push('La cantidad debe ser un número entero mayor o igual a 1');
+        }
+
+        if (errors.length > 0) {
+          e.preventDefault();
+          let existingAlert = document.querySelector('.validation-alert');
+          if (existingAlert) existingAlert.remove();
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'validation-alert alert alert-danger';
+          alertDiv.innerHTML = '<strong>Errores:</strong><ul>' + errors.map(er => '<li>' + er + '</li>').join('') + '</ul>';
+          form.parentElement.prepend(alertDiv);
+          window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+      });
     });

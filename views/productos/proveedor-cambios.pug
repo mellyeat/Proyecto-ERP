@@ -1,0 +1,72 @@
+extends ../layout/main.pug
+
+block variables
+  - var activePage = 'productos'
+  - var title = 'Editar Proveedor - ERP'
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2.fw-bold(style="color: var(--color-dark-teal);") Modificar Proveedor
+    a.btn.btn-outline-secondary(href="/productos/proveedores")
+      i.fa-solid.fa-arrow-left.me-2
+      | Volver al Directorio
+
+  form(action="/productos/proveedor-edit", method="POST")
+    input(type="hidden", name="id", value=proveedor.id)
+    .row.g-4
+      //- SECCIÓN 1: Datos de la Empresa
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-building.me-2
+                | 1. Datos de la Empresa
+            .p-4
+              .mb-3
+                label.form-label.text-muted.small Nombre Comercial o Razón Social
+                input.form-control.bg-light(type="text", name="empresa", value=proveedor.razon_social, placeholder="Ej: TechSupplies Inc.", required)
+              
+              .mb-3
+                label.form-label.text-muted.small RFC Fiscal
+                input.form-control.bg-light.text-uppercase(type="text", name="rfc", value=proveedor.rfc || '', placeholder="Opcional pero recomendado", maxlength="13")
+
+              .mb-3
+                label.form-label.text-muted.small Categoría Principal
+                select.form-select.bg-light(name="categoria")
+                  option(value="" disabled, selected=!proveedor.categoria) Seleccionar...
+                  option(value="electronica", selected=proveedor.categoria === 'electronica') Electrónica de Consumo
+                  option(value="perifericos", selected=proveedor.categoria === 'perifericos') Periféricos / Accesorios
+                  option(value="software", selected=proveedor.categoria === 'software') Mayorista de Software
+                  option(value="oficina", selected=proveedor.categoria === 'oficina') Mobiliario de Oficina
+                  option(value="otro", selected=proveedor.categoria === 'otro') Otro rubro logístico
+
+      //- SECCIÓN 2: Persona de Contacto
+      .col-md-6
+        .card-custom.h-100
+          .card-body.p-0
+            .p-3.border-bottom
+              h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
+                i.fa-solid.fa-address-card.me-2
+                | 2. Contacto Administrativo / Ventas
+
+            .p-4
+              .mb-3
+                label.form-label.text-muted.small Nombre del Contacto
+                input.form-control.bg-light(type="text", name="contacto", value=proveedor.contacto_nombre || '', placeholder="Ej: Lic. Antonio Aguilar", required)
+
+              .mb-3
+                label.form-label.text-muted.small Teléfono Celular / Oficina
+                input.form-control.bg-light(type="tel", name="telefono", value=proveedor.telefono || '', placeholder="(555) 123-4567")
+
+              .mb-3
+                label.form-label.text-muted.small Correo Electrónico Comercial
+                input.form-control.bg-light(type="email", name="email", value=proveedor.email || '', placeholder="ventas@techsupplies.com", required)
+
+    .row.mt-4
+      .col-12
+        .d-flex.gap-3.justify-content-end
+          a.btn.btn-secondary.px-4.py-2(href="/productos/proveedores") Cancelar
+          button.btn.btn-primary-custom.px-5.py-2(type="submit")
+            i.fa-solid.fa-floppy-disk.me-2
+            | Guardar Cambios

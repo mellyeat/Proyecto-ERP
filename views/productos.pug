@@ -63,6 +63,7 @@ block content
                   th Producto
                   th Stock Actual
                   th Estado
+                  th Acciones
               tbody
                 if lowStockProducts && lowStockProducts.length > 0
                   each prod in lowStockProducts
@@ -79,9 +80,15 @@ block content
                           span.badge.bg-warning.text-dark Riesgo
                         else
                           span.badge.bg-info Bajo
+                      td
+                        .d-flex.gap-2
+                          a.btn.btn-sm.btn-warning(href=`/productos/cambios?id=${prod.id}`, title="Editar")
+                            i.fa-solid.fa-pencil
+                          button.btn.btn-sm.btn-danger(title="Eliminar", onclick=`confirmarEliminarProd(${prod.id}, '${prod.nombre}')`)
+                            i.fa-solid.fa-trash
                 else
                   tr
-                    td(colspan="4").text-center.text-muted.p-4 No hay productos con bajo stock
+                    td(colspan="5").text-center.text-muted.p-4 No hay productos con bajo stock
 
     .col-md-4
       .card-custom.h-100
@@ -94,9 +101,38 @@ block content
             .chart-wrapper.w-100
               canvas#inventoryChart(style="max-height: 250px; width: 100%;")
 
+  //- Modal: Confirmar Eliminación de Producto
+  .modal.fade#modalEliminarProd(tabindex="-1", aria-labelledby="modalEliminarProdLabel", aria-hidden="true")
+    .modal-dialog.modal-dialog-centered
+      .modal-content(style="border: none; border-radius: 16px; overflow: hidden;")
+        .modal-header.bg-danger.text-white(style="border: none;")
+          h5.modal-title#modalEliminarProdLabel
+            i.fa-solid.fa-triangle-exclamation.me-2
+            | Eliminar Producto
+          button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Cerrar")
+        .modal-body.p-4
+          p.mb-1 ¿Estás seguro de que deseas eliminar el producto:
+          p.fw-bold.fs-5#nombreProdEliminar
+          .alert.alert-warning.mt-3.mb-0
+            i.fa-solid.fa-info-circle.me-2
+            | Esta acción es irreversible. El historial de ventas conservará los registros existentes.
+        .modal-footer(style="border-top: 1px solid #eee;")
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cancelar
+          form#formEliminarProd(method="POST", style="margin: 0;")
+            button.btn.btn-danger(type="submit")
+              i.fa-solid.fa-trash.me-2
+              | Sí, Eliminar
+
   //- Hidden data for chart
   script.
     window.__inventoryData = !{chartData};
+
+    function confirmarEliminarProd(prodId, prodNombre) {
+      document.getElementById('nombreProdEliminar').textContent = prodNombre;
+      document.getElementById('formEliminarProd').action = '/productos/delete/' + prodId;
+      var modal = new bootstrap.Modal(document.getElementById('modalEliminarProd'));
+      modal.show();
+    }
 
 block scripts
   script(src="https://cdn.jsdelivr.net/npm/chart.js")
