@@ -13,12 +13,20 @@ block content
 
   .card-custom
     .card-body.p-0
-      .p-3.border-bottom
+      .p-3.border-bottom.d-flex.justify-content-between.align-items-center
         h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
           i.fa-solid.fa-list.me-2
           | Listado de Cotizaciones Registradas
+        .input-group(style="width: 300px;")
+          input#searchCotizaciones.form-control.form-control-sm(
+            type="text", 
+            placeholder="Buscar por cliente, folio...",
+            autocomplete="off"
+          )
+          button.btn.btn-outline-secondary.btn-sm
+            i.fa-solid.fa-search
       .table-responsive
-        table.table.table-custom.mb-0
+        table.table.table-custom.mb-0#tablaBusquedaCotizaciones
           thead
             tr
               th Folio
@@ -27,7 +35,7 @@ block content
               th Total
               th Estado
               th Acciones
-          tbody
+          tbody#cotizacionesTableBody
             if cotizaciones && cotizaciones.length > 0
               each coti in cotizaciones
                 tr

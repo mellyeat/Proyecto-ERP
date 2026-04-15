@@ -19,13 +19,17 @@ block content
             h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
               i.fa-solid.fa-truck-fast.me-2
               | Proveedores Registrados
-            .input-group(style="width: 250px;")
-              input#searchProveedor.form-control.form-control-sm(type="text", placeholder="Buscar proveedor...")
-              button.btn.btn-outline-secondary.btn-sm(onclick="filtrarProveedores()")
+            .input-group(style="width: 300px;")
+              input#searchProveedores.form-control.form-control-sm(
+                type="text", 
+                placeholder="Buscar por nombre, RFC...",
+                autocomplete="off"
+              )
+              button.btn.btn-outline-secondary.btn-sm
                 i.fa-solid.fa-search
                 
           .table-responsive
-            table.table.table-custom.mb-0.align-middle
+            table.table.table-custom.mb-0.align-middle#tablaBusquedaProveedores
               thead
                 tr
                   th ID
@@ -34,7 +38,7 @@ block content
                   th Artículos Surtidos
                   th Estado
                   th Acciones
-              tbody#tablaProveedores
+              tbody#proveedoresTableBody
                 if proveedores && proveedores.length > 0
                   each prov in proveedores
                     tr.fila-proveedor
@@ -109,4 +113,4 @@ block content
               i.fa-solid.fa-trash.me-2
               | Sí, Eliminar
 
-block scripts
+block scripts

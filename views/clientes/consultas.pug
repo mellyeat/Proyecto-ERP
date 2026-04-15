@@ -17,13 +17,17 @@ block content
         h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
           i.fa-solid.fa-users-rectangle.me-2
           | Directorio Comercial
-        .input-group(style="width: 250px;")
-          input.form-control.form-control-sm(type="text", placeholder="Buscar cliente o RFC...")
+        .input-group(style="width: 300px;")
+          input#searchClientes.form-control.form-control-sm(
+            type="text", 
+            placeholder="Buscar cliente o RFC...",
+            autocomplete="off"
+          )
           button.btn.btn-outline-secondary.btn-sm
             i.fa-solid.fa-search
             
       .table-responsive
-        table.table.table-custom.mb-0.align-middle
+        table.table.table-custom.mb-0.align-middle#tablaBusquedaClientes
           thead
             tr
               th Cliente / Comercial
@@ -31,7 +35,7 @@ block content
               th Contacto Principal
               th Saldo Pendiente
               th Acciones
-          tbody
+          tbody#clientesTableBody
             if clientes && clientes.length > 0
               each cliente in clientes
                 tr

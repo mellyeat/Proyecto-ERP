@@ -17,8 +17,16 @@ block content
         h6.fw-bold.mb-0(style="color: var(--color-dark-teal);")
           i.fa-solid.fa-id-card.me-2
           | Empleados Registrados
+        .input-group(style="width: 300px;")
+          input#searchEmpleados.form-control.form-control-sm(
+            type="text", 
+            placeholder="Buscar por nombre, usuario...",
+            autocomplete="off"
+          )
+          button.btn.btn-outline-secondary.btn-sm
+            i.fa-solid.fa-search
       .table-responsive
-        table.table.table-custom.mb-0.align-middle
+        table.table.table-custom.mb-0.align-middle#tablaBusquedaEmpleados
           thead
             tr
               th ID
@@ -29,7 +37,7 @@ block content
               th Salario
               th Estado
               th Acciones
-          tbody
+          tbody#empleadosTableBody
             if empleados && empleados.length > 0
               each emp in empleados
                 tr

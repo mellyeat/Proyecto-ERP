@@ -943,6 +943,116 @@ router.get('/api/low-stock', verificarSesion, (req, res) => {
     );
 });
 
+// ─── ENDPOINTS DE BÚSQUEDA (SEARCH API) ───────────────────────────────
+
+// Búsqueda de Ventas
+router.get('/api/search/ventas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const q = req.query.q ? `%${req.query.q}%` : '%';
+    db.query(`
+        SELECT v.*, c.nombre_comercial AS cliente_nombre, p.nombre AS producto_nombre, vd.cantidad 
+        FROM ventas v 
+        LEFT JOIN clientes c ON v.cliente_id = c.id 
+        LEFT JOIN venta_detalle vd ON v.id = vd.venta_id 
+        LEFT JOIN productos p ON vd.producto_id = p.id 
+        WHERE v.id LIKE ? OR c.nombre_comercial LIKE ? OR p.nombre LIKE ? OR v.folio_fiscal LIKE ?
+        ORDER BY v.fecha_emision DESC
+    `, [q, q, q, q], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error en búsqueda" });
+        }
+        res.json(results || []);
+    });
+});
+
+// Búsqueda de Productos
+router.get('/api/search/productos', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
+    const q = req.query.q ? `%${req.query.q}%` : '%';
+    db.query(`
+        SELECT p.*, pr.razon_social AS proveedor_nombre 
+        FROM productos p 
+        LEFT JOIN proveedores pr ON p.proveedor_id = pr.id 
+        WHERE p.nombre LIKE ? OR p.id LIKE ? OR pr.razon_social LIKE ?
+        ORDER BY p.nombre ASC
+    `, [q, q, q], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error en búsqueda" });
+        }
+        res.json(results || []);
+    });
+});
+
+// Búsqueda de Clientes
+router.get('/api/search/clientes', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const q = req.query.q ? `%${req.query.q}%` : '%';
+    db.query(`
+        SELECT * FROM clientes 
+        WHERE nombre_comercial LIKE ? OR rfc LIKE ? OR email LIKE ? OR telefono LIKE ?
+        ORDER BY nombre_comercial ASC
+    `, [q, q, q, q], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error en búsqueda" });
+        }
+        res.json(results || []);
+    });
+});
+
+// Búsqueda de Empleados
+router.get('/api/search/empleados', verificarSesion, verificarRol(['RH']), (req, res) => {
+    const q = req.query.q ? `%${req.query.q}%` : '%';
+    db.query(`
+        SELECT * FROM empleados_usuarios 
+        WHERE nombre_completo LIKE ? OR usuario LIKE ? OR puesto LIKE ? OR rol LIKE ?
+        ORDER BY nombre_completo ASC
+    `, [q, q, q, q], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error en búsqueda" });
+        }
+        res.json(results || []);
+    });
+});
+
+// Búsqueda de Cotizaciones
+router.get('/api/search/cotizaciones', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
+    const q = req.query.q ? `%${req.query.q}%` : '%';
+    db.query(`
+        SELECT c.*, cl.nombre_comercial AS cliente_nombre 
+        FROM cotizaciones c 
+        LEFT JOIN clientes cl ON c.cliente_id = cl.id 
+        WHERE c.id LIKE ? OR cl.nombre_comercial LIKE ? OR c.estado LIKE ?
+        ORDER BY c.fecha_emision DESC
+    `, [q, q, q], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error en búsqueda" });
+        }
+        res.json(results || []);
+    });
+});
+
+// Búsqueda de Proveedores
+router.get('/api/search/proveedores', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
+    const q = req.query.q ? `%${req.query.q}%` : '%';
+    db.query(`
+        SELECT p.id, p.razon_social, p.rfc, p.categoria, p.contacto_nombre, p.telefono, p.email,
+               COUNT(pr.id) AS total_productos
+        FROM proveedores p
+        LEFT JOIN productos pr ON pr.proveedor_id = p.id
+        WHERE p.razon_social LIKE ? OR p.rfc LIKE ? OR p.contacto_nombre LIKE ? OR p.email LIKE ?
+        GROUP BY p.id
+        ORDER BY p.razon_social ASC
+    `, [q, q, q, q], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error en búsqueda" });
+        }
+        res.json(results || []);
+    });
+});
+
 // Esta ruta es para cerrar sesión
 router.get('/logout', (req, res) => {
     req.session.destroy(() => {

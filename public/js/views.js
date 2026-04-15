@@ -452,3 +452,298 @@ window.mostrarToast = function(msg, tipo) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2500);
 }
+
+// ─────────────────────────────────────────────────────────────
+// FUNCIONES DE BÚSQUEDA POR MÓDULO
+// ─────────────────────────────────────────────────────────────
+
+// Búsqueda de Ventas
+const searchVentasInput = document.getElementById('searchVentas');
+if (searchVentasInput) {
+  searchVentasInput.addEventListener('input', debounce(async function(e) {
+    const query = e.target.value.trim();
+    const endpoint = query ? `/api/search/ventas?q=${encodeURIComponent(query)}` : '/ventas/consultas';
+    
+    try {
+      const response = await fetch(endpoint);
+      const data = await response.json();
+      renderVentasTable(query ? data : null);
+    } catch (err) {
+      console.error('Error en búsqueda de ventas:', err);
+    }
+  }, 300));
+}
+
+function renderVentasTable(ventas) {
+  const tbody = document.getElementById('ventasTableBody');
+  if (!tbody) return;
+  
+  if (!ventas || ventas.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted p-4">No se encontraron resultados</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  ventas.forEach(v => {
+    const tipo = v.tipo_comprobante === 'Factura' ? '<span class="badge bg-info text-dark"><i class="fa-solid fa-file-invoice me-1"></i>Factura</span>' 
+                                                   : '<span class="badge bg-secondary"><i class="fa-solid fa-receipt me-1"></i>Ticket</span>';
+    html += `<tr>
+      <td class="text-muted">#${v.id}</td>
+      <td class="fw-bold">${v.cliente_nombre || 'Desconocido'}</td>
+      <td>${v.producto_nombre || 'N/A'}</td>
+      <td class="fw-bold" style="color: var(--color-teal);">$${v.total}</td>
+      <td>${tipo}</td>
+      <td class="small text-muted">${new Date(v.fecha_emision).toLocaleString()}</td>
+      <td><a class="btn btn-sm btn-outline-custom" href="/ventas/ticket?id=${v.id}"><i class="fa-solid fa-receipt me-1"></i>Ticket</a></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// Búsqueda de Productos
+const searchProductosInput = document.getElementById('searchProductos');
+if (searchProductosInput) {
+  searchProductosInput.addEventListener('input', debounce(async function(e) {
+    const query = e.target.value.trim();
+    
+    try {
+      const response = await fetch(`/api/search/productos?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      renderProductosTable(data);
+    } catch (err) {
+      console.error('Error en búsqueda de productos:', err);
+    }
+  }, 300));
+}
+
+function renderProductosTable(productos) {
+  const tbody = document.getElementById('productosTableBody');
+  if (!tbody) return;
+  
+  if (!productos || productos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted p-4">No se encontraron productos</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  productos.forEach(p => {
+    const stock = p.stock < 10 ? `<span class="badge bg-danger">${p.stock} (Bajo)</span>` : `<span class="badge bg-success">${p.stock}</span>`;
+    html += `<tr>
+      <td class="text-muted">#${p.id}</td>
+      <td class="fw-bold">${p.nombre}</td>
+      <td class="small text-muted">${p.proveedor_nombre || 'Sin Proveedor'}</td>
+      <td>${stock}</td>
+      <td class="fw-bold" style="color: var(--color-teal);">$${p.precio}</td>
+      <td>
+        <div class="d-flex gap-2">
+          <a class="btn btn-sm btn-warning" href="/productos/cambios?id=${p.id}"><i class="fa-solid fa-pencil"></i></a>
+          <button class="btn btn-sm btn-danger" onclick="confirmarEliminarProd(${p.id}, '${p.nombre}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// Búsqueda de Clientes
+const searchClientesInput = document.getElementById('searchClientes');
+if (searchClientesInput) {
+  searchClientesInput.addEventListener('input', debounce(async function(e) {
+    const query = e.target.value.trim();
+    
+    try {
+      const response = await fetch(`/api/search/clientes?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      renderClientesTable(data);
+    } catch (err) {
+      console.error('Error en búsqueda de clientes:', err);
+    }
+  }, 300));
+}
+
+function renderClientesTable(clientes) {
+  const tbody = document.getElementById('clientesTableBody');
+  if (!tbody) return;
+  
+  if (!clientes || clientes.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted p-4">No se encontraron clientes</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  clientes.forEach(c => {
+    html += `<tr>
+      <td>
+        <div class="fw-bold">${c.nombre_comercial}</div>
+        <div class="small text-muted">Cliente Activo</div>
+      </td>
+      <td>
+        <div class="fw-bold text-uppercase" style="color: var(--color-dark-teal);">${c.rfc || 'N/A'}</div>
+        <div class="small text-muted">${c.direccion_fiscal || 'Sin dirección'}</div>
+      </td>
+      <td>
+        <div class="small"><i class="fa-solid fa-envelope me-1 text-muted"></i>${c.email}</div>
+        <div class="small"><i class="fa-solid fa-phone me-1 text-muted"></i>${c.telefono}</div>
+      </td>
+      <td class="fw-bold" style="color: var(--color-teal);">$0.00</td>
+      <td>
+        <div class="d-flex gap-2">
+          <a class="btn btn-sm btn-warning" href="/clientes/cambios?id=${c.id}"><i class="fa-solid fa-pencil"></i></a>
+          <a class="btn btn-sm btn-success" href="/ventas/factura-view"><i class="fa-solid fa-file-invoice-dollar me-1"></i>Facturar</a>
+        </div>
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// Búsqueda de Empleados
+const searchEmpleadosInput = document.getElementById('searchEmpleados');
+if (searchEmpleadosInput) {
+  searchEmpleadosInput.addEventListener('input', debounce(async function(e) {
+    const query = e.target.value.trim();
+    
+    try {
+      const response = await fetch(`/api/search/empleados?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      renderEmpleadosTable(data);
+    } catch (err) {
+      console.error('Error en búsqueda de empleados:', err);
+    }
+  }, 300));
+}
+
+function renderEmpleadosTable(empleados) {
+  const tbody = document.getElementById('empleadosTableBody');
+  if (!tbody) return;
+  
+  if (!empleados || empleados.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted p-4">No se encontraron empleados</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  empleados.forEach(emp => {
+    const badgeColor = emp.rol === 'admin' ? 'bg-dark' : emp.rol === 'RH' ? 'bg-primary' : emp.rol === 'VENTAS' ? 'bg-success' : 'bg-warning text-dark';
+    const estado = emp.activo ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+    html += `<tr>
+      <td class="text-muted">#${emp.id}</td>
+      <td>
+        <div class="fw-bold">${emp.nombre_completo}</div>
+        <div class="small text-muted">${new Date(emp.fecha_contratacion).toLocaleDateString()}</div>
+      </td>
+      <td><code>${emp.usuario}</code></td>
+      <td>${emp.puesto || 'Sin asignar'}</td>
+      <td><span class="badge ${badgeColor}">${emp.rol}</span></td>
+      <td class="fw-bold" style="color: var(--color-teal);">$${parseFloat(emp.salario || 0).toFixed(2)}</td>
+      <td>${estado}</td>
+      <td><a class="btn btn-sm btn-warning" href="/empleados/cambios?id=${emp.id}"><i class="fa-solid fa-pencil"></i></a></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// Búsqueda de Cotizaciones
+const searchCotizacionesInput = document.getElementById('searchCotizaciones');
+if (searchCotizacionesInput) {
+  searchCotizacionesInput.addEventListener('input', debounce(async function(e) {
+    const query = e.target.value.trim();
+    
+    try {
+      const response = await fetch(`/api/search/cotizaciones?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      renderCotizacionesTable(data);
+    } catch (err) {
+      console.error('Error en búsqueda de cotizaciones:', err);
+    }
+  }, 300));
+}
+
+function renderCotizacionesTable(cotizaciones) {
+  const tbody = document.getElementById('cotizacionesTableBody');
+  if (!tbody) return;
+  
+  if (!cotizaciones || cotizaciones.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted p-4">No se encontraron cotizaciones</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  cotizaciones.forEach(coti => {
+    const estado = coti.estado === 'Convertida' ? '<span class="badge bg-success">Convertida a Venta</span>' : '<span class="badge bg-warning text-dark">Pendiente</span>';
+    let acciones = `<div class="d-flex gap-2"><a class="btn btn-sm btn-info text-white" href="/cotizaciones/view?id=${coti.id}" target="_blank"><i class="fa-solid fa-print"></i></a>`;
+    if(coti.estado === 'Pendiente') {
+      acciones += `<a class="btn btn-sm btn-success" href="/cotizaciones/convertir?id=${coti.id}" onclick="return confirm('¿Seguro que deseas convertir esta cotización en venta real? Esto restará stock temporalmente.')"><i class="fa-solid fa-money-bill-wave"></i></a>`;
+    }
+    acciones += '</div>';
+    html += `<tr>
+      <td class="text-muted fw-bold">C-${String(coti.id).padStart(5, '0')}</td>
+      <td class="fw-bold">${coti.cliente_nombre || 'Desconocido'}</td>
+      <td class="small text-muted">${new Date(coti.fecha_emision).toLocaleDateString('es-MX')}</td>
+      <td class="fw-bold" style="color: var(--color-teal);">$${coti.total}</td>
+      <td>${estado}</td>
+      <td>${acciones}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// Búsqueda de Proveedores
+const searchProveedoresInput = document.getElementById('searchProveedores');
+if (searchProveedoresInput) {
+  searchProveedoresInput.addEventListener('input', debounce(async function(e) {
+    const query = e.target.value.trim();
+    
+    try {
+      const response = await fetch(`/api/search/proveedores?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      renderProveedoresTable(data);
+    } catch (err) {
+      console.error('Error en búsqueda de proveedores:', err);
+    }
+  }, 300));
+}
+
+function renderProveedoresTable(proveedores) {
+  const tbody = document.getElementById('proveedoresTableBody');
+  if (!tbody) return;
+  
+  if (!proveedores || proveedores.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted p-4">No se encontraron proveedores</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  proveedores.forEach(prov => {
+    html += `<tr class="fila-proveedor">
+      <td class="text-muted">#PRV-${prov.id}</td>
+      <td>
+        <div class="fw-bold">${prov.razon_social}</div>
+        <div class="small text-muted">${prov.categoria}</div>
+      </td>
+      <td>
+        <div class="small"><i class="fa-solid fa-phone me-1 text-muted"></i>${prov.telefono}</div>
+        <div class="small"><i class="fa-solid fa-envelope me-1 text-muted"></i>${prov.email}</div>
+      </td>
+      <td class="text-center"><span class="badge bg-light text-dark border">${prov.total_productos || 0} productos</span></td>
+      <td><span class="badge bg-success">Activo</span></td>
+      <td>
+        <div class="d-flex gap-2">
+          <a class="btn btn-sm btn-warning" href="/productos/proveedor-cambios?id=${prov.id}"><i class="fa-solid fa-pencil"></i></a>
+          <button class="btn btn-sm btn-outline-custom" onclick="verProductos(${prov.id}, '${prov.razon_social}')"><i class="fa-solid fa-box-open"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="confirmarEliminar(${prov.id}, '${prov.razon_social}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// Función de debounce para evitar múltiples llamadas
+function debounce(func, delay) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}

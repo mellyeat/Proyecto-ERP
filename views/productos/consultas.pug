@@ -10,12 +10,20 @@ block content
 
   .card-custom
     .card-body.p-0
-      .p-3.border-bottom
+      .p-3.border-bottom.d-flex.justify-content-between.align-items-center
         h6.fw-bold.mb-0(style="color: var(--color-dark-teal);") 
           i.fa-solid.fa-boxes-stacked.me-2
           | Listado de Productos
+        .input-group(style="width: 300px;")
+          input#searchProductos.form-control.form-control-sm(
+            type="text", 
+            placeholder="Buscar por nombre, proveedor...",
+            autocomplete="off"
+          )
+          button.btn.btn-outline-secondary.btn-sm
+            i.fa-solid.fa-search
       .table-responsive
-        table.table.table-custom.mb-0
+        table.table.table-custom.mb-0#tablaBusquedaProductos
           thead
             tr
               th ID
@@ -24,7 +32,7 @@ block content
               th Stock
               th Precio
               th Acciones
-          tbody
+          tbody#productosTableBody
             if productos && productos.length > 0
               each prod in productos
                 tr
