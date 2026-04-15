@@ -150,11 +150,7 @@ body {
 }
 
 
-/* =============================================
-   CHART ENTRANCE ANIMATIONS
-   ============================================= */
 
-/* Wrapper container for each chart */
 .chart-wrapper {
   opacity: 0;
   transform: translateY(30px) scale(0.97);
@@ -163,18 +159,16 @@ body {
   will-change: opacity, transform;
 }
 
-/* State triggered by IntersectionObserver */
+
 .chart-wrapper.chart-visible {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
 
-/* Staggered delay variants */
+
 .chart-wrapper.delay-1 { transition-delay: 0.1s; }
 .chart-wrapper.delay-2 { transition-delay: 0.25s; }
 .chart-wrapper.delay-3 { transition-delay: 0.4s; }
-
-/* Shimmer loading pulse while chart renders */
 @keyframes chartShimmer {
   0%   { background-position: -400px 0; }
   100% { background-position: 400px 0; }
@@ -193,7 +187,6 @@ body {
   min-height: 200px;
 }
 
-/* Metric cards entrance */
 @keyframes slideUpFade {
   from {
     opacity: 0;
@@ -210,11 +203,7 @@ body {
 }
 
 
-/* =============================================
-   NOTIFICATION BELL
-   ============================================= */
 
-/* Badge counter on the bell icon */
 .notif-badge {
   position: absolute;
   top: -4px;
@@ -232,7 +221,6 @@ body {
   box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
 }
 
-/* Subtle pulsing ring animation */
 @keyframes bellPulse {
   0%   { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5); }
   70%  { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
@@ -241,8 +229,6 @@ body {
 .notif-pulse .notif-badge {
   animation: bellPulse 2s ease infinite;
 }
-
-/* Gentle bell swing on new data */
 @keyframes bellSwing {
   0%   { transform: rotate(0deg); }
   15%  { transform: rotate(12deg); }
@@ -257,7 +243,7 @@ body {
   animation: bellSwing 1s ease 0.3s 1;
 }
 
-/* ── Dropdown Panel ── */
+
 .notif-panel {
   position: absolute;
   top: calc(100% + 10px);
@@ -275,7 +261,7 @@ body {
   overflow: hidden;
 }
 
-/* Small arrow at top */
+
 .notif-panel::before {
   content: '';
   position: absolute;
@@ -294,7 +280,7 @@ body {
   transform: translateY(0) scale(1);
 }
 
-/* Header */
+
 .notif-header {
   display: flex;
   justify-content: space-between;
@@ -315,7 +301,6 @@ body {
   border-radius: 50px;
 }
 
-/* List area */
 .notif-list {
   max-height: 280px;
   overflow-y: auto;
@@ -330,7 +315,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* Individual item */
 .notif-item {
   display: flex;
   align-items: center;
@@ -347,7 +331,6 @@ body {
   color: inherit;
 }
 
-/* Severity left accent */
 .notif-item.notif-critical { border-left: 3px solid #dc3545; }
 .notif-item.notif-warning  { border-left: 3px solid #ffc107; }
 .notif-item.notif-low      { border-left: 3px solid #0dcaf0; }
@@ -390,7 +373,7 @@ body {
   opacity: 0.6;
 }
 
-/* Footer */
+
 .notif-footer {
   padding: 10px 16px;
   text-align: center;
@@ -408,16 +391,14 @@ body {
   color: var(--color-dark-teal);
 }
 
-/* =============================================
-   MOBILE RESPONSIVE LAYOUT (OFF-CANVAS & BOTTOM NAV)
-   ============================================= */
+
 @media (max-width: 767.98px) {
-  /* Ensure content doesn't get hidden behind the bottom nav */
+  
   body {
     padding-bottom: 75px !important;
   }
 
-  /* Off-canvas sidebar */
+  
   .sidebar {
     position: fixed !important;
     top: 0;
@@ -435,7 +416,7 @@ body {
     left: 0;
   }
 
-  /* Bottom Tab Navigation */
+  
   .bottom-nav {
     display: flex !important;
     position: fixed;
@@ -451,14 +432,13 @@ body {
     border-top-right-radius: 20px;
   }
 
-  /* Top Navbar */
+  
   .top-navbar {
     z-index: 1040;
     position: sticky;
     top: 0;
   }
 
-  /* Dropdown panels matching mobile width */
   .notif-panel {
     width: calc(100vw - 30px);
     right: -60px;
@@ -469,7 +449,7 @@ body {
   }
 }
 
-/* Sidebar Overlay */
+
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -489,7 +469,7 @@ body {
   visibility: visible;
 }
 
-/* Desktop Bottom Nav hide */
+
 .bottom-nav {
   display: none;
 }

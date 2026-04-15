@@ -13,13 +13,13 @@ html(lang="es")
     link(rel="stylesheet", href="/css/views.css")
 
   body
-    // Mobile Sidebar Overlay
+    // Mobile Sidebar 
     #sidebarOverlay.sidebar-overlay
 
     .container-fluid.p-0
       .row.g-0
 
-        // ================= SIDEBAR =================
+        // SIDEBAR 
         .col-md-2.sidebar.d-flex.flex-column#mobileSidebar
           .sidebar-heading
             i.fa-solid.fa-chart-pie.me-2
@@ -198,7 +198,7 @@ html(lang="es")
               span.navbar-brand.fs-5.text-muted Hola, Bienvenido
 
             .d-flex.align-items-center.gap-3
-              //- Notification Bell
+             
               .position-relative#notifBellWrapper
                 button#notifBell.btn.btn-link.position-relative.p-1(
                   type="button",
@@ -208,7 +208,7 @@ html(lang="es")
                   i.fa-solid.fa-bell
                   span#notifBadge.notif-badge.d-none 0
                 
-                //- Dropdown Panel
+                
                 .notif-panel#notifPanel
                   .notif-header
                     span.fw-bold
@@ -231,7 +231,7 @@ html(lang="es")
           .p-4.flex-grow-1
             block content
 
-    // ================= BOTTOM NAV (MOBILE) =================
+    // BOTTOM NAV (MOBILE)
     nav.bottom-nav.d-md-none
       a.bottom-nav-item(href="/dashboard", class=(activePage === 'dashboard' ? 'active' : ''))
         i.fa-solid.fa-gauge-high

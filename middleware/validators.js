@@ -1,13 +1,4 @@
-/**
- * Middleware de Validaciones para ERP
- * Funciones reutilizables para sanitizar y validar datos de formularios
- */
 
-// ─── Funciones de Sanitización ───────────────────────────────────────
-
-/**
- * Limpia un string de caracteres HTML peligrosos para prevenir XSS
- */
 function sanitize(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -18,15 +9,11 @@ function sanitize(str) {
         .replace(/'/g, '&#x27;');
 }
 
-/**
- * Limpia y recorta espacios de un string
- */
 function trimSanitize(str) {
     if (str === null || str === undefined) return '';
     return sanitize(String(str).trim());
 }
 
-// ─── Funciones de Validación ─────────────────────────────────────────
 
 function isNonEmpty(val) {
     if (val === null || val === undefined) return false;
@@ -54,7 +41,7 @@ function isNonNegativeInteger(val) {
 }
 
 function isValidEmail(email) {
-    if (!email || String(email).trim() === '') return true; // Opcional
+    if (!email || String(email).trim() === '') return true; 
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).trim());
 }
@@ -66,20 +53,19 @@ function isRequiredEmail(email) {
 }
 
 function isValidPhone(phone) {
-    if (!phone || String(phone).trim() === '') return true; // Opcional
-    // Al menos 7 dígitos
+    if (!phone || String(phone).trim() === '') return true; 
     const digits = String(phone).replace(/\D/g, '');
     return digits.length >= 7 && digits.length <= 15;
 }
 
 function isValidRFC(rfc) {
-    if (!rfc || String(rfc).trim() === '') return true; // Opcional
+    if (!rfc || String(rfc).trim() === '') return true; 
     const re = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i;
     return re.test(String(rfc).trim());
 }
 
 function isValidCP(cp) {
-    if (!cp || String(cp).trim() === '') return true; // Opcional
+    if (!cp || String(cp).trim() === '') return true; 
     return /^\d{5}$/.test(String(cp).trim());
 }
 
@@ -88,12 +74,10 @@ function isValidId(val) {
     return !isNaN(n) && isFinite(n) && Number.isInteger(n) && n > 0;
 }
 
-// ─── Roles válidos del sistema ───────────────────────────────────────
 
 const ROLES_VALIDOS = ['admin', 'Admin', 'SUPER ADMIN', 'RH', 'VENTAS', 'COMPRAS'];
 const ESTADOS_FACTURA = ['Pendiente', 'Pagada', 'Vencida'];
 
-// ─── Middleware Factory ──────────────────────────────────────────────
 
 /**
  * Crea un middleware de validación basado en reglas

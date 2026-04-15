@@ -1,9 +1,4 @@
--- ==========================================
--- DATOS SEMILLA PARA ERP
--- Ejecutar DESPUÉS de erp_db_migration.sql
--- ==========================================
-
--- ── EMPLEADOS ──
+--datos semilla sumulados para que la app se vea atractiva visualmente--
 INSERT INTO empleados_usuarios (nombre_completo, usuario, password, rol, puesto, salario, activo) VALUES
 ('María García López', 'mgarcia', 'pass123', 'VENTAS', 'Ejecutiva de Ventas', 18500.00, true),
 ('Carlos Rodríguez Martínez', 'crodriguez', 'pass123', 'COMPRAS', 'Jefe de Compras', 22000.00, true),
@@ -12,7 +7,6 @@ INSERT INTO empleados_usuarios (nombre_completo, usuario, password, rol, puesto,
 ('Laura Mendoza Sánchez', 'lmendoza', 'pass123', 'COMPRAS', 'Auxiliar de Almacén', 12500.00, true),
 ('Fernando Torres Ruiz', 'ftorres', 'pass123', 'VENTAS', 'Asesor Comercial', 16000.00, false);
 
--- ── PROVEEDORES ──
 INSERT INTO proveedores (razon_social, rfc, categoria, contacto_nombre, telefono, email) VALUES
 ('TechDistributor S.A. de C.V.', 'TDI980512AB3', 'electronica', 'Ing. Pedro Castillo', '(55) 5512-3456', 'ventas@techdist.mx'),
 ('Periféricos Globales', 'PGL030821MN7', 'perifericos', 'Lic. Mariana Ríos', '(33) 3345-6789', 'contacto@perifglobal.com'),
@@ -20,7 +14,6 @@ INSERT INTO proveedores (razon_social, rfc, categoria, contacto_nombre, telefono
 ('Muebles Ejecutivos del Norte', 'MEN950714TU9', 'oficina', 'Sr. Raúl Vega', '(81) 8834-5678', 'raul@mueblesej.mx'),
 ('Conectividad Total', 'COT180620XY5', 'electronica', 'Dra. Paola Guzmán', '(55) 5567-8901', 'paola@contotal.com');
 
--- ── CLIENTES ──
 INSERT INTO clientes (nombre_comercial, contacto_principal, telefono, email, requiere_factura, razon_social, rfc, direccion_fiscal, codigo_postal, regimen_fiscal) VALUES
 ('Corporativo Azteca S.A.', 'Lic. Jorge Ramírez', '(55) 5523-4567', 'jorge@corpazteca.mx', 1, 'Corporativo Azteca S.A. de C.V.', 'CAZ980315AB1', 'Av. Reforma 350 Piso 12, Col. Juárez, CDMX', '06600', '601'),
 ('Restaurantes Don Miguel', 'Chef Miguel Ángel Ortiz', '(33) 3312-8899', 'miguel@donmiguel.com', 1, 'Alimentos Don Miguel S.A.', 'ADM050721QW3', 'Blvd. Vallarta 2450, Guadalajara, Jal.', '44130', '612'),
@@ -31,7 +24,6 @@ INSERT INTO clientes (nombre_comercial, contacto_principal, telefono, email, req
 ('Hotel Paraíso Costero', 'Gerente Luis Mora', '(998) 888-3300', 'lmora@paraisocostero.com', 1, 'Operadora Paraíso Costero S.A.', 'OPC081115RT8', 'Blvd. Kukulcán Km 14.5, Cancún, QR', '77500', '601'),
 ('Imprenta Digital Express', 'Diseñador Kevin Reyes', '(442) 215-6600', 'kreyes@impdigital.mx', 1, 'Imprenta Digital Express S.A.', 'IDE140507AB0', 'Av. Universidad 380, Querétaro, Qro.', '76010', '612');
 
--- ── PRODUCTOS (variados con algunos en bajo stock) ──
 INSERT INTO productos (nombre, proveedor_id, stock, precio) VALUES
 ('Laptop Dell Inspiron 15', 1, 5, 18999.00),
 ('Monitor Samsung 27" 144Hz', 1, 8, 6499.00),
@@ -52,74 +44,59 @@ INSERT INTO productos (nombre, proveedor_id, stock, precio) VALUES
 ('UPS CyberPower 1500VA', 5, 6, 3799.00),
 ('Router TP-Link WiFi 6', 5, 35, 1499.00);
 
--- ── VENTAS (distribuidas en los últimos 10 días) ──
--- Venta 1 (hace 10 días)
+
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (1, 2, 18999.00, 3039.84, 22038.84, DATE_SUB(NOW(), INTERVAL 10 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 1, 1, 18999.00, 18999.00);
 
--- Venta 2 (hace 9 días)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (2, 2, 12998.00, 2079.68, 15077.68, DATE_SUB(NOW(), INTERVAL 9 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 2, 2, 6499.00, 12998.00);
 
--- Venta 3 (hace 7 días)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (3, 5, 5196.00, 831.36, 6027.36, DATE_SUB(NOW(), INTERVAL 7 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 3, 4, 1299.00, 5196.00);
-
--- Venta 4 (hace 6 días)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (4, 2, 7499.00, 1199.84, 8698.84, DATE_SUB(NOW(), INTERVAL 6 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 5, 1, 7499.00, 7499.00);
 
--- Venta 5 (hace 5 días)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (5, 5, 9198.00, 1471.68, 10669.68, DATE_SUB(NOW(), INTERVAL 5 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 9, 2, 4599.00, 9198.00);
-
--- Venta 6 (hace 4 días)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (1, 2, 15996.00, 2559.36, 18555.36, DATE_SUB(NOW(), INTERVAL 4 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 14, 2, 3499.00, 6998.00);
 
--- Venta 7 (hace 3 días)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (7, 5, 8999.00, 1439.84, 10438.84, DATE_SUB(NOW(), INTERVAL 3 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 10, 1, 8999.00, 8999.00);
 
--- Venta 8 (hace 2 días)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (6, 2, 3198.00, 511.68, 3709.68, DATE_SUB(NOW(), INTERVAL 2 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 6, 2, 1599.00, 3198.00);
 
--- Venta 9 (hace 1 día)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (8, 5, 5997.00, 959.52, 6956.52, DATE_SUB(NOW(), INTERVAL 1 DAY));
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 13, 3, 1999.00, 5997.00);
-
--- Venta 10 (hoy)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (4, 2, 3798.00, 607.68, 4405.68, NOW());
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 4, 2, 1899.00, 3798.00);
 
--- Venta 11 (hoy)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (2, 5, 13997.00, 2239.52, 16236.52, NOW());
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES
 (LAST_INSERT_ID(), 8, 3, 2199.00, 6597.00);
 
--- Venta 12 (hoy)
 INSERT INTO ventas (cliente_id, empleado_id, subtotal, iva, total, fecha_emision) VALUES
 (5, 2, 7598.00, 1215.68, 8813.68, NOW());
 INSERT INTO venta_detalle (venta_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES

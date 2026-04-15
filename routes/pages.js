@@ -38,7 +38,7 @@ router.post('/login',
             }
 
             if (results.length === 1) {
-                req.session.usuario = results[0]; // se guarda el usuario en la sesión
+                req.session.usuario = results[0]; 
                 res.redirect('/dashboard');
             } else {
                 res.render('index', {
@@ -85,7 +85,7 @@ router.get('/dashboard', verificarSesion, (req, res) => {
 
 });
 
-// ================== EMPLEADOS (RH) ==================
+//  EMPLEADOS (esto solo lo ve RH)
 router.get('/empleados', verificarSesion, verificarRol(['RH']), (req, res) => {
     db.query(
         "SELECT COUNT(*) AS total, SUM(CASE WHEN activo=1 THEN 1 ELSE 0 END) AS activos, SUM(CASE WHEN activo=0 THEN 1 ELSE 0 END) AS inactivos, AVG(salario) AS salario_promedio FROM empleados_usuarios",
@@ -238,7 +238,7 @@ router.post('/productos/proveedor-add', verificarSesion, verificarRol(['COMPRAS'
     );
 });
 
-// Editar proveedor - mostrar formulario
+// Editar proveedor 
 router.get('/productos/proveedor-cambios', verificarSesion, verificarRol(['COMPRAS']), (req, res) => {
     const id = req.query.id;
     if (!id) return res.redirect('/productos/proveedores');
@@ -248,7 +248,7 @@ router.get('/productos/proveedor-cambios', verificarSesion, verificarRol(['COMPR
     });
 });
 
-// Editar proveedor - guardar cambios
+// Editar proveedor esto en gurdado los cambios
 router.post('/productos/proveedor-edit', verificarSesion, verificarRol(['COMPRAS']),
     validateBody({
         id:       { required: true, validId: true, label: 'ID del proveedor' },
@@ -276,7 +276,7 @@ router.post('/productos/proveedor-edit', verificarSesion, verificarRol(['COMPRAS
 // Eliminar proveedor
 router.post('/productos/proveedor-delete/:id', verificarSesion, verificarRol(['COMPRAS']), validateParamId('id'), (req, res) => {
     const id = req.params.id;
-    // Primero desvinculamos los productos que tengan este proveedor
+    // quitamos los productos que el proveedor o se los designamos
     db.query("UPDATE productos SET proveedor_id = NULL WHERE proveedor_id = ?", [id], (err) => {
         if (err) console.log(err);
         db.query("DELETE FROM proveedores WHERE id = ?", [id], (err) => {
@@ -289,7 +289,7 @@ router.post('/productos/proveedor-delete/:id', verificarSesion, verificarRol(['C
     });
 });
 
-// API: Productos de un proveedor (para modal AJAX)
+// nos traemos los productos con metodo ajax
 router.get('/api/proveedor-productos', verificarSesion, (req, res) => {
     const id = req.query.id;
     if (!id) return res.json([]);
@@ -463,7 +463,7 @@ router.get('/ventas/facturas', verificarSesion, verificarRol(['VENTAS']), (req, 
     });
 });
 
-// Cambiar estatus de factura (AJAX)
+// Cambiar estatus de factura con ajax
 router.post('/ventas/facturas/cambiar-estado', verificarSesion, verificarRol(['VENTAS']),
     validateBody({
         id:     { required: true, validId: true, label: 'ID de factura' },
@@ -579,7 +579,7 @@ router.get('/ventas/factura-view', verificarSesion, verificarRol(['VENTAS']), (r
     });
 });
 
-// ================== CLIENTES (CRM) ==================
+// CLIENTES (CRM)
 router.get('/clientes', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     db.query(`
         SELECT
@@ -688,7 +688,7 @@ router.post('/clientes/edit', verificarSesion, verificarRol(['VENTAS']),
     );
 });
 
-// AGREGAR VENTA (PRO)
+// AGREGAR VENTA
 router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']),
     validateBody({
         cliente_id:  { required: true, validId: true, label: 'Cliente' },
@@ -747,7 +747,7 @@ router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']),
 });
 
 
-// ================== COTIZACIONES ==================
+// COTIZACIONES
 router.get('/cotizaciones/consultas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {
     db.query(`
         SELECT c.*, cl.nombre_comercial AS cliente_nombre 

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-  // 1. Off-Canvas Sidebar
   const toggleBtn = document.getElementById('sidebarToggle');
   const sidebar = document.getElementById('mobileSidebar');
   const overlay = document.getElementById('sidebarOverlay');
@@ -17,7 +16,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // 2. Global Chart Entrance Animation
   const observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
@@ -34,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
     card.style.animationDelay = (i * 0.07) + 's';
   });
 
-  // 3. Notification Bell: Low Stock Alerts
   const bell = document.getElementById('notifBell');
   const panel = document.getElementById('notifPanel');
   const badge = document.getElementById('notifBadge');
@@ -91,7 +88,6 @@ document.addEventListener("DOMContentLoaded", function() {
     setInterval(loadAlerts, 60000);
   }
 
-  // 4. Ventas: Toggle Secion Facturacion
   const toggleFactura = document.getElementById('requiereFactura');
   const seccionFacturacion = document.getElementById('seccionFacturacion');
   if (toggleFactura && seccionFacturacion) {
@@ -106,7 +102,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // 5. Autocalculate Totals (Cotizaciones / Ventas)
   const selectProducto = document.getElementById('producto');
   const inputMonto = document.getElementById('monto');
   const inputCantidad = document.getElementById('cantidad');
@@ -125,13 +120,12 @@ document.addEventListener("DOMContentLoaded", function() {
   if(inputCantidad) inputCantidad.addEventListener('input', actualizarTotal);
 
 
-  // 6. Generic Form Validation
   const forms = document.querySelectorAll('form');
   forms.forEach(form => {
     form.addEventListener('submit', function(e) {
       let errors = [];
 
-      // Validaciones Clientes / Generales
+      //Clientes / Generales
       const nombre = form.querySelector('[name="nombre"]');
       const email = form.querySelector('[name="email"]');
       const telefono = form.querySelector('[name="telefono"]');
@@ -158,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const salario = form.querySelector('[name="salario"]');
       const rol = form.querySelector('[name="rol"]');
 
-      // Validar según lo que exista en el form actual
+      // Validar lo qje tenga el formulario
       if (nombre && !nombre.value.trim() && form.action.includes('clientes')) errors.push('El nombre comercial es obligatorio');
       if (nombre && !nombre.value.trim() && form.action.includes('productos')) errors.push('El nombre del producto es obligatorio');
       
@@ -217,12 +211,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  // 7. Descargar PDF (Unificada)
+  // Descargar PDF
   window.descargarPDF = function(filename) {
     const element = document.getElementById('printableArea');
     if(!element) return;
     
-    // Asignar el PDF global (cargado via CDN en pug)
+    // Asignar el PDF global
     if(typeof html2pdf === 'undefined') {
       console.error("html2pdf no está cargado");
       return;
@@ -258,8 +252,7 @@ document.addEventListener("DOMContentLoaded", function() {
     html2pdf().set(opt).from(element).save();
   }
 
-  // 8. Gráficas y Métricas (Dashboard)
-  // Dashboard principal usa fetch, ventas y productos usan window variables
+  //Gráficas
   if(document.getElementById('ventasChart') && window.location.pathname === '/dashboard') {
     fetch('/api/metricas')
       .then(res => res.json())
@@ -344,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // 9. Buscador Proveedores
+  // Buscador Proveedores
   const searchInput = document.getElementById('searchProveedor');
   if (searchInput) {
     function filtrarProveedores() {

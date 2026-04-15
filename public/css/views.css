@@ -141,7 +141,6 @@
       border: 1px solid #eee;
     }
     
-    /* Ajustes para que las tablas se vean bien en el PDF */
     .ticket-container table {
       width: 100%;
       border-collapse: collapse;

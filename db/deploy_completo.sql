@@ -1,7 +1,4 @@
--- ==========================================
--- MIGRACIÓN COMPLETA PARA DEPLOY EN LA NUBE
--- Ejecutar en la base de datos de Railway
--- ==========================================
+
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -16,7 +13,6 @@ DROP TABLE IF EXISTS empleados_usuarios;
 DROP TABLE IF EXISTS empleados;
 DROP TABLE IF EXISTS usuarios;
 
--- ── TABLA: EMPLEADOS/USUARIOS ──
 CREATE TABLE empleados_usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_completo VARCHAR(150),
@@ -29,7 +25,6 @@ CREATE TABLE empleados_usuarios (
     fecha_contratacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- ── TABLA: PROVEEDORES ──
 CREATE TABLE proveedores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     razon_social VARCHAR(150),
@@ -40,7 +35,7 @@ CREATE TABLE proveedores (
     email VARCHAR(100)
 );
 
--- ── TABLA: CLIENTES ──
+
 CREATE TABLE clientes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_comercial VARCHAR(150),
@@ -55,7 +50,7 @@ CREATE TABLE clientes (
     regimen_fiscal VARCHAR(50)
 );
 
--- ── TABLA: PRODUCTOS ──
+
 CREATE TABLE productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     proveedor_id INT,
@@ -66,7 +61,7 @@ CREATE TABLE productos (
     FOREIGN KEY (proveedor_id) REFERENCES proveedores(id) ON DELETE SET NULL
 );
 
--- ── TABLA: VENTAS ──
+
 CREATE TABLE ventas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT,
@@ -82,7 +77,7 @@ CREATE TABLE ventas (
     FOREIGN KEY (empleado_id) REFERENCES empleados_usuarios(id) ON DELETE SET NULL
 );
 
--- ── TABLA: DETALLE DE VENTAS ──
+
 CREATE TABLE venta_detalle (
     id INT AUTO_INCREMENT PRIMARY KEY,
     venta_id INT,
@@ -94,7 +89,7 @@ CREATE TABLE venta_detalle (
     FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE SET NULL
 );
 
--- ── TABLA: COTIZACIONES ──
+
 CREATE TABLE cotizaciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT,
@@ -109,7 +104,7 @@ CREATE TABLE cotizaciones (
     FOREIGN KEY (empleado_id) REFERENCES empleados_usuarios(id) ON DELETE SET NULL
 );
 
--- ── TABLA: DETALLE DE COTIZACIONES ──
+
 CREATE TABLE cotizacion_detalle (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cotizacion_id INT,
@@ -121,7 +116,7 @@ CREATE TABLE cotizacion_detalle (
     FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE SET NULL
 );
 
--- ── USUARIO ADMIN POR DEFECTO ──
+
 INSERT INTO empleados_usuarios (nombre_completo, usuario, password, rol, puesto, activo)
 VALUES ('Administrador Sistema', 'admin', '1234', 'admin', 'Gerente', true);
 
