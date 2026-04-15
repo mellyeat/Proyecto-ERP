@@ -16,6 +16,60 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
+  // Parse Action URL Params for CoolAlerts
+  const urlParams = new URLSearchParams(window.location.search);
+  const actionStatus = urlParams.get('action');
+  const actionType = urlParams.get('type');
+  
+  if (actionStatus && actionType) {
+     let title = '';
+     let text = '';
+     let icon = 'success';
+     let displayType = 'toast';
+     const typeCapitalized = actionType.charAt(0).toUpperCase() + actionType.slice(1);
+
+     if (actionStatus === 'add') {
+         title = '¡Registro Exitoso!';
+         text = `${typeCapitalized} ha sido guardado correctamente en tu sistema.`;
+         displayType = 'modal'; 
+     } else if (actionStatus === 'edit') {
+         title = '¡Actualizado!';
+         text = `${typeCapitalized} modificado correctamente.`;
+         displayType = 'toast';
+     } else if (actionStatus === 'delete') {
+         title = '¡Eliminado!';
+         text = `${typeCapitalized} fue eliminado permanentemente.`;
+         displayType = 'toast';
+     } else if (actionStatus === 'convert') {
+         title = '¡Venta Creada!';
+         text = 'La cotización se convirtió a venta exitosamente.';
+         displayType = 'modal';
+     }
+
+     if (title) {
+        if (displayType === 'modal') {
+            CoolAlert.show({
+                title: title,
+                text: text,
+                icon: icon,
+                confirmButtonText: 'Continuar',
+                confirmButtonColor: '#088395'
+            });
+        } else {
+            CoolAlert.show({
+                toast: true,
+                position: 'top-right',
+                title: title,
+                text: text,
+                icon: icon
+            });
+        }
+        
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+     }
+  }
+
   const observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {

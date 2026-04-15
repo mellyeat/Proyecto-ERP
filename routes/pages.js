@@ -125,7 +125,7 @@ router.post('/empleados/add', verificarSesion, verificarRol(['RH']),
                 console.log(err);
                 return res.status(500).send("Error adding employee");
             }
-            res.redirect('/empleados/consultas');
+            res.redirect('/empleados/consultas?action=add&type=empleado');
         }
     );
 });
@@ -154,7 +154,7 @@ router.post('/empleados/edit', verificarSesion, verificarRol(['RH']),
         [nombre_completo, usuario, puesto, rol, salario || 0, activoVal, id],
         (err) => {
             if (err) { console.log(err); return res.status(500).send("Error updating employee"); }
-            res.redirect('/empleados/consultas');
+            res.redirect('/empleados/consultas?action=edit&type=empleado');
         }
     );
 });
@@ -233,7 +233,7 @@ router.post('/productos/proveedor-add', verificarSesion, verificarRol(['COMPRAS'
                 console.log(err);
                 return res.status(500).send("Error agregando proveedor");
             }
-            res.redirect('/productos/proveedores');
+            res.redirect('/productos/proveedores?action=add&type=proveedor');
         }
     );
 });
@@ -268,7 +268,7 @@ router.post('/productos/proveedor-edit', verificarSesion, verificarRol(['COMPRAS
                 console.log(err);
                 return res.status(500).send("Error actualizando proveedor");
             }
-            res.redirect('/productos/proveedores');
+            res.redirect('/productos/proveedores?action=edit&type=proveedor');
         }
     );
 });
@@ -284,7 +284,7 @@ router.post('/productos/proveedor-delete/:id', verificarSesion, verificarRol(['C
                 console.log(err);
                 return res.status(500).send("Error eliminando proveedor");
             }
-            res.redirect('/productos/proveedores');
+            res.redirect('/productos/proveedores?action=delete&type=proveedor');
         });
     });
 });
@@ -334,7 +334,7 @@ router.post('/productos/edit', verificarSesion, verificarRol(['COMPRAS']),
                 console.log(err);
                 return res.status(500).send("Error actualizando producto");
             }
-            res.redirect('/productos/consultas');
+            res.redirect('/productos/consultas?action=edit&type=producto');
         }
     );
 });
@@ -356,7 +356,7 @@ router.post('/productos/add', verificarSesion, verificarRol(['COMPRAS']),
                 console.log(err);
                 return res.status(500).send("Error adding product");
             }
-            res.redirect('/productos/consultas');
+            res.redirect('/productos/consultas?action=add&type=producto');
         }
     );
 });
@@ -375,7 +375,7 @@ router.post('/productos/delete/:id', verificarSesion, verificarRol(['COMPRAS']),
                     console.log(err);
                     return res.status(500).send("Error eliminando producto");
                 }
-                res.redirect(referer);
+                res.redirect((referer.split('?')[0] || '/productos/consultas') + '?action=delete&type=producto');
             });
         });
     });
@@ -637,7 +637,7 @@ router.post('/clientes/add', verificarSesion, verificarRol(['VENTAS']),
                 console.log(err);
                 return res.status(500).send("Error agregando cliente");
             }
-            res.redirect('/clientes/consultas');
+            res.redirect('/clientes/consultas?action=add&type=cliente');
         }
     );
 });
@@ -683,7 +683,7 @@ router.post('/clientes/edit', verificarSesion, verificarRol(['VENTAS']),
                 console.log(err);
                 return res.status(500).send("Error actualizando cliente");
             }
-            res.redirect('/clientes/consultas');
+            res.redirect('/clientes/consultas?action=edit&type=cliente');
         }
     );
 });
@@ -734,9 +734,9 @@ router.post('/ventas/add', verificarSesion, verificarRol(['VENTAS']),
                     (err) => {
                         db.query("UPDATE productos SET stock = stock - ? WHERE id = ?", [cantidad, producto_id], () => {
                             if (req.body.origen === 'compras') {
-                                res.redirect('/compras');
+                                res.redirect('/compras?action=add&type=compra');
                             } else {
-                                res.redirect('/ventas/consultas');
+                                res.redirect('/ventas/consultas?action=add&type=venta');
                             }
                         });
                     }
@@ -804,7 +804,7 @@ router.post('/cotizaciones/add', verificarSesion, verificarRol(['VENTAS']),
                     "INSERT INTO cotizacion_detalle (cotizacion_id, producto_id, cantidad, precio_unitario, importe_linea) VALUES (?, ?, ?, ?, ?)",
                     [cotiId, producto_id, cantidad, prod.precio, subtotal],
                     (err) => {
-                        res.redirect('/cotizaciones/consultas');
+                        res.redirect('/cotizaciones/consultas?action=add&type=cotización');
                     }
                 );
             }
@@ -882,7 +882,7 @@ router.get('/cotizaciones/convertir', verificarSesion, verificarRol(['VENTAS']),
                             (err) => {
                                 db.query("UPDATE productos SET stock = stock - ? WHERE id = ?", [det.cantidad, det.producto_id], () => {
                                     db.query("UPDATE cotizaciones SET estado = 'Convertida' WHERE id = ?", [id], () => {
-                                        res.redirect('/ventas/consultas');
+                                        res.redirect('/ventas/consultas?action=convert&type=cotización');
                                     });
                                 });
                             }
