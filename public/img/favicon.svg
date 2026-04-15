@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Pie Chart Favicon -->
+  <circle cx="256" cy="256" r="230" fill="#088395"/>
+  <path d="M256,26 L256,256 L476,183 A230,230 0 0,0 256,26 Z" fill="#09637E"/>
+  <path d="M256,256 L486,256 A230,230 0 0,0 476,183 Z" fill="#7AB2B2"/>
+</svg>
