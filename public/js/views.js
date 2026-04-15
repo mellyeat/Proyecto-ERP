@@ -30,8 +30,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
      if (actionStatus === 'add') {
          title = '¡Registro Exitoso!';
-         text = `${typeCapitalized} ha sido guardado correctamente en tu sistema.`;
-         displayType = 'modal'; 
+         text = `${typeCapitalized} ha sido guardado correctamente.`;
+         displayType = 'toast'; 
      } else if (actionStatus === 'edit') {
          title = '¡Actualizado!';
          text = `${typeCapitalized} modificado correctamente.`;
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
      } else if (actionStatus === 'convert') {
          title = '¡Venta Creada!';
          text = 'La cotización se convirtió a venta exitosamente.';
-         displayType = 'modal';
+         displayType = 'toast';
      }
 
      if (title) {
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             CoolAlert.show({
                 toast: true,
-                position: 'top-right',
+                position: 'bottom-right',
                 title: title,
                 text: text,
                 icon: icon
@@ -525,7 +525,7 @@ window.mostrarToast = function(msg, tipo) {
 
   CoolAlert.show({
     toast: true,
-    position: 'top-right',
+    position: 'bottom-right',
     icon: icon,
     title: title,
     text: msg
