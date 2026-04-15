@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // Empleados
       const nombre_completo = form.querySelector('[name="nombre_completo"]');
       const usuario = form.querySelector('[name="usuario"]');
-      const password = form.querySelector('[name="password"]');
+      const password = form.querySelector('[name="password"]') || form.querySelector('[name="password_new"]');
       const salario = form.querySelector('[name="salario"]');
       const rol = form.querySelector('[name="rol"]');
 
@@ -243,8 +243,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
       if (nombre_completo && !nombre_completo.value.trim()) errors.push('El nombre completo es obligatorio');
       if (usuario && usuario.value.trim().length < 3) errors.push('El usuario debe tener al menos 3 caracteres');
-      if (password && password.value.length > 0 && password.value.length < 4) errors.push('La contraseña debe tener al menos 4 caracteres');
-      if (password && form.action.includes('add') && password.value.length < 4) errors.push('La contraseña debe tener al menos 4 caracteres');
+      if (password && password.value.length > 0) {
+        if (password.value.length < 6) {
+          errors.push('La contraseña debe tener al menos 6 caracteres');
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>\-_+=\[\]/\\]/.test(password.value)) {
+          errors.push('La contraseña debe contener al menos 1 carácter especial');
+        }
+      } else if (password && form.action.includes('add') && password.name === 'password' && password.value.length === 0) {
+        errors.push('La contraseña es obligatoria, con al menos 6 caracteres y 1 especial');
+      }
       if (rol && !rol.value) errors.push('Debes seleccionar un rol');
       if (salario && salario.value && Number(salario.value) < 0) errors.push('El salario no puede ser negativo');
 

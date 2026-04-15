@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const bcrypt = require('bcryptjs');
 const verificarSesion = require('../middleware/auth');
 const verificarRol = require('../middleware/roles');
 const { validateBody, validateParamId, validateQueryId, sanitize, ROLES_VALIDOS, ESTADOS_FACTURA } = require('../middleware/validators');
@@ -29,8 +30,8 @@ router.post('/login',
     const { usuario, password } = req.body;
 
     db.query(
-        "SELECT * FROM empleados_usuarios WHERE usuario = ? AND password = ? AND activo = true",
-        [usuario, password],
+        "SELECT * FROM empleados_usuarios WHERE usuario = ? AND activo = true",
+        [usuario],
         (err, results) => {
 
             if (err) {
@@ -38,8 +39,22 @@ router.post('/login',
             }
 
             if (results.length === 1) {
-                req.session.usuario = results[0]; 
-                res.redirect('/dashboard');
+                const user = results[0];
+                let match = false;
+                try {
+                    match = bcrypt.compareSync(password, user.password) || password === user.password;
+                } catch(e) {
+                    match = password === user.password;
+                }
+
+                if (match) {
+                    req.session.usuario = user; 
+                    res.redirect('/dashboard');
+                } else {
+                    res.render('index', {
+                        error: "Usuario o contraseña incorrectos"
+                    });
+                }
             } else {
                 res.render('index', {
                     error: "Usuario o contraseña incorrectos"
@@ -111,15 +126,17 @@ router.post('/empleados/add', verificarSesion, verificarRol(['RH']),
     validateBody({
         nombre_completo: { required: true, label: 'Nombre completo' },
         usuario:         { required: true, minLength: 3, label: 'Usuario' },
-        password:        { required: true, minLength: 4, label: 'Contraseña' },
+        password:        { required: true, password: true, label: 'Contraseña' },
         rol:             { required: true, oneOf: ROLES_VALIDOS, label: 'Rol' },
         salario:         { nonNegative: true, label: 'Salario' }
     }),
     (req, res) => {
     const { nombre_completo, usuario, password, puesto, rol, salario } = req.body;
+    const salt = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(password, salt);
     db.query(
         "INSERT INTO empleados_usuarios (nombre_completo, usuario, password, puesto, rol, salario) VALUES (?, ?, ?, ?, ?, ?)",
-        [nombre_completo, usuario, password, puesto, rol, salario || 0],
+        [nombre_completo, usuario, hashPassword, puesto, rol, salario || 0],
         (err) => {
             if (err) {
                 console.log(err);
@@ -139,6 +156,14 @@ router.get('/empleados/cambios', verificarSesion, verificarRol(['RH']), (req, re
 });
 
 router.post('/empleados/edit', verificarSesion, verificarRol(['RH']),
+    (req, res, next) => {
+        if (req.body.password_new && req.body.password_new.trim() !== '') {
+            if (req.body.password_new.length < 6 || !/[!@#$%^&*(),.?":{}|<>\-_+=\[\]/\\]/.test(req.body.password_new)) {
+                return res.status(400).json({ success: false, message: 'Errores de validación', errors: ['La nueva contraseña debe tener al menos 6 caracteres y 1 carácter especial'] });
+            }
+        }
+        next();
+    },
     validateBody({
         id:              { required: true, validId: true, label: 'ID del empleado' },
         nombre_completo: { required: true, label: 'Nombre completo' },
@@ -147,11 +172,22 @@ router.post('/empleados/edit', verificarSesion, verificarRol(['RH']),
         salario:         { nonNegative: true, label: 'Salario' }
     }),
     (req, res) => {
-    const { id, nombre_completo, usuario, puesto, rol, salario, activo } = req.body;
+    const { id, nombre_completo, usuario, puesto, rol, salario, activo, password_new } = req.body;
     const activoVal = activo === 'on' ? 1 : 0;
+    
+    let query = "UPDATE empleados_usuarios SET nombre_completo=?, usuario=?, puesto=?, rol=?, salario=?, activo=? WHERE id=?";
+    let params = [nombre_completo, usuario, puesto, rol, salario || 0, activoVal, id];
+    
+    if (password_new && password_new.trim() !== '') {
+        query = "UPDATE empleados_usuarios SET nombre_completo=?, usuario=?, puesto=?, rol=?, salario=?, activo=?, password=? WHERE id=?";
+        const salt = bcrypt.genSaltSync(10);
+        const hashPassword = bcrypt.hashSync(password_new, salt);
+        params = [nombre_completo, usuario, puesto, rol, salario || 0, activoVal, hashPassword, id];
+    }
+
     db.query(
-        "UPDATE empleados_usuarios SET nombre_completo=?, usuario=?, puesto=?, rol=?, salario=?, activo=? WHERE id=?",
-        [nombre_completo, usuario, puesto, rol, salario || 0, activoVal, id],
+        query,
+        params,
         (err) => {
             if (err) { console.log(err); return res.status(500).send("Error updating employee"); }
             res.redirect('/empleados/consultas?action=edit&type=empleado');
@@ -929,7 +965,7 @@ router.get('/api/metricas', verificarSesion, (req, res) => {
     });
 });
 
-// API – Productos con bajo stock (para campanita de notificaciones)
+// API, Productos con bajo stock (para campanita de notificaciones)
 router.get('/api/low-stock', verificarSesion, (req, res) => {
     db.query(
         "SELECT id, nombre, stock FROM productos WHERE stock < 10 ORDER BY stock ASC LIMIT 20",
@@ -943,7 +979,7 @@ router.get('/api/low-stock', verificarSesion, (req, res) => {
     );
 });
 
-// ─── ENDPOINTS DE BÚSQUEDA (SEARCH API) ───────────────────────────────
+// ENDPOINTS DE BÚSQUEDA (SEARCH API) 
 
 // Búsqueda de Ventas
 router.get('/api/search/ventas', verificarSesion, verificarRol(['VENTAS']), (req, res) => {

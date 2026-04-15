@@ -152,6 +152,14 @@ function validateBody(rules) {
                 if (rule.minLength && String(val).trim().length < rule.minLength) {
                     errors.push(`${label} debe tener al menos ${rule.minLength} caracteres`);
                 }
+                if (rule.password) {
+                    if (String(val).length < 6) {
+                        errors.push(`${label} debe tener al menos 6 caracteres`);
+                    }
+                    if (!/[!@#$%^&*(),.?":{}|<>\-_+=\[\]/\\]/.test(val)) {
+                        errors.push(`${label} debe contener al menos un carácter especial`);
+                    }
+                }
                 if (rule.oneOf && !rule.oneOf.includes(val)) {
                     errors.push(`${label} debe ser uno de: ${rule.oneOf.join(', ')}`);
                 }
