@@ -16,11 +16,11 @@ function login(event) {
         if (data.success) {
             window.location.href = "/dashboard";
         } else {
-            alert("Usuario o contraseña incorrectos");
+            CoolAlert.show({icon: "error", title: "Error", text: "Usuario o contraseña incorrectos"});
         }
     })
     .catch(err => {
         console.error(err);
-        alert("Error en el servidor");
+        CoolAlert.show({icon: "error", title: "Error", text: "Error en el servidor"});
     });
 }

@@ -196,17 +196,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
       if (errors.length > 0) {
         e.preventDefault();
-        let existingAlert = form.querySelector('.validation-alert');
-        if (existingAlert) existingAlert.remove();
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'validation-alert alert alert-danger';
-        alertDiv.innerHTML = '<strong>Errores:</strong><ul>' + errors.map(er => '<li>' + er + '</li>').join('') + '</ul>';
-        if (form.parentElement.classList.contains('card-body') || form.parentElement.classList.contains('p-4')) {
-          form.parentElement.prepend(alertDiv);
-        } else {
-          form.prepend(alertDiv);
-        }
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        CoolAlert.show({
+          title: "Errores de validación",
+          html: '<ul style="text-align: left; margin: 0; padding-left: 20px; color: #b00;">' + errors.map(er => '<li>' + er + '</li>').join('') + '</ul>',
+          icon: "error"
+        });
       }
     });
   });
@@ -385,16 +379,42 @@ window.verProductos = function(provId, provNombre) {
     });
 }
 window.confirmarEliminar = function(provId, provNombre) {
-  document.getElementById('nombreProvEliminar').textContent = provNombre;
-  document.getElementById('formEliminar').action = '/productos/proveedor-delete/' + provId;
-  const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
-  modal.show();
+  CoolAlert.show({
+    title: '¿Eliminar proveedor?',
+    text: `Estás a punto de eliminar a ${provNombre}. Esta acción no se puede deshacer.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    confirmButtonColor: '#dc3545',
+    cancelButtonText: 'Cancelar'
+  }).then(res => {
+    if (res.isConfirmed) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/productos/proveedor-delete/' + provId;
+      document.body.appendChild(form);
+      form.submit();
+    }
+  });
 }
 window.confirmarEliminarProd = function(prodId, prodNombre) {
-  document.getElementById('nombreProdEliminar').textContent = prodNombre;
-  document.getElementById('formEliminarProd').action = '/productos/delete/' + prodId;
-  const modal = new bootstrap.Modal(document.getElementById('modalEliminarProd'));
-  modal.show();
+  CoolAlert.show({
+    title: '¿Eliminar producto?',
+    text: `Estás a punto de eliminar el producto "${prodNombre}". Esta acción no se puede deshacer.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    confirmButtonColor: '#dc3545',
+    cancelButtonText: 'Cancelar'
+  }).then(res => {
+    if (res.isConfirmed) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/productos/delete/' + prodId;
+      document.body.appendChild(form);
+      form.submit();
+    }
+  });
 }
 
 // Facturas
@@ -443,14 +463,19 @@ window.actualizarContadores = function() {
   if(document.getElementById('countVencida')) document.getElementById('countVencida').textContent = counts.Vencida;
 }
 window.mostrarToast = function(msg, tipo) {
-  const toast = document.getElementById('statusToast');
-  if (!toast) return;
-  toast.textContent = msg;
-  if (tipo === 'Pagada') toast.style.background = 'linear-gradient(135deg, #198754, #157347)';
-  else if (tipo === 'Vencida' || tipo === 'error') toast.style.background = 'linear-gradient(135deg, #dc3545, #b02a37)';
-  else toast.style.background = 'linear-gradient(135deg, #ffc107, #e0a800)';
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+  let icon = 'info';
+  let title = 'Notificación';
+  if (tipo === 'Pagada') { icon = 'success'; title = 'Pagada'; }
+  else if (tipo === 'Vencida' || tipo === 'error') { icon = 'error'; title = 'Error'; }
+  else { icon = 'warning'; title = tipo || 'Aviso'; }
+
+  CoolAlert.show({
+    toast: true,
+    position: 'top-right',
+    icon: icon,
+    title: title,
+    text: msg
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -673,7 +698,7 @@ function renderCotizacionesTable(cotizaciones) {
     const estado = coti.estado === 'Convertida' ? '<span class="badge bg-success">Convertida a Venta</span>' : '<span class="badge bg-warning text-dark">Pendiente</span>';
     let acciones = `<div class="d-flex gap-2"><a class="btn btn-sm btn-info text-white" href="/cotizaciones/view?id=${coti.id}" target="_blank"><i class="fa-solid fa-print"></i></a>`;
     if(coti.estado === 'Pendiente') {
-      acciones += `<a class="btn btn-sm btn-success" href="/cotizaciones/convertir?id=${coti.id}" onclick="return confirm('¿Seguro que deseas convertir esta cotización en venta real? Esto restará stock temporalmente.')"><i class="fa-solid fa-money-bill-wave"></i></a>`;
+      acciones += `<a class="btn btn-sm btn-success" href="/cotizaciones/convertir?id=${coti.id}" onclick="event.preventDefault(); CoolAlert.show({title:'Confirmar Conversión', text:'¿Seguro que deseas convertir esta cotización en venta real? Esto restará stock temporalmente.', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, convertir'}).then(r => { if(r.isConfirmed) window.location.href=this.href; })"><i class="fa-solid fa-money-bill-wave"></i></a>`;
     }
     acciones += '</div>';
     html += `<tr>
