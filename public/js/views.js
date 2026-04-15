@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", function() {
               borderWidth: 0
             }]
           },
-          options: { responsive: true, maintainAspectRatio: false, animation: { animateRotate: true, animateScale: true }, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } } }
+          options: { responsive: true, maintainAspectRatio: false, animation: { animateRotate: true, animateScale: true }, plugins: { legend: { position: 'right' } } }
         });
       })
       .catch(err => console.error("Error cargando métricas:", err));
